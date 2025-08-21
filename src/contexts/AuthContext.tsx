@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback, ReactNode } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User as FirebaseUser } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, firebaseInitialized } from '@/lib/firebase';
 import type { User } from '@/lib/types';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 
@@ -27,6 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [redirectPath, setRedirectPath] = useLocalStorage<string | null>('redirectPath', null);
 
   useEffect(() => {
+    if (!firebaseInitialized) return;
     const unsub = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
       if (fbUser) {
         try {
