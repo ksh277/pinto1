@@ -17,6 +17,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Prevent accidental commit of npm lockfile
+package-lock.json
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Build outputs / caches
 # ─────────────────────────────────────────────────────────────────────────────

@@ -2,13 +2,16 @@
   "name": "nextn",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": { "node": ">=20 <21", "pnpm": ">=9" },
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "pnpm type-check && pnpm lint && next build",
     "start": "next start -p 3000",
     "lint": "next lint --max-warnings=0",
     "format": "prettier --write .",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.14.1",
