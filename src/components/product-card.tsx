@@ -4,11 +4,9 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Heart } from 'lucide-react';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { httpsCallable } from 'firebase/functions';
 import type { Product } from '@/lib/types';
-import { db, auth, functions, firebaseInitialized } from '@/lib/firebase';
 import Link from 'next/link';
+import { toggleLike, getLikeCount, getMyLike } from '@/lib/likes';
 
 export function ProductCard({ product }: { product: Product }) {
   const [liked, setLiked] = useState(false);
@@ -17,52 +15,26 @@ export function ProductCard({ product }: { product: Product }) {
     review: product.stats?.reviewCount ?? 0,
   });
 
-  // 실시간 카운트 구독 (선택: 이미 리스트에서 값 받으면 생략 가능)
   useEffect(() => {
-    if (!firebaseInitialized) return;
-    const unsub = onSnapshot(doc(db, 'products', product.id), (snap) => {
-      const d = snap.data() as Product;
-      if (!d) return;
-      setCounts({
-        like: d.stats?.likeCount ?? 0,
-        review: d.stats?.reviewCount ?? 0,
-      });
-    });
-    return () => unsub();
+    getLikeCount(product.id).then((c) =>
+      setCounts((prev) => ({ ...prev, like: c }))
+    );
+    getMyLike(product.id).then(setLiked);
   }, [product.id]);
 
-  // 현재 사용자가 이미 좋아요 눌렀는지
-  useEffect(() => {
-    if (!firebaseInitialized) return;
-    const uid = auth.currentUser?.uid;
-    if (!uid) { setLiked(false); return; }
-    const unsub = onSnapshot(doc(db, `products/${product.id}/likes`, uid), (s) => {
-      setLiked(s.exists());
-    });
-    return () => unsub();
-  }, [auth.currentUser, product.id]);
-
-  const toggleLike = async () => {
-    if (!firebaseInitialized) {
-        alert('Firebase is not configured. Please add API keys to your .env file.');
-        return;
-    }
-    const user = auth.currentUser;
-    if (!user) {
-      alert('로그인이 필요합니다.');
-      return;
-    }
-    const call = httpsCallable(functions, 'toggleProductLike');
-    // 낙관적 UI
-    setLiked(v => !v);
+  const onToggle = async () => {
+    const prevLiked = liked;
+    const prevCount = counts.like;
+    setLiked(!prevLiked);
+    setCounts((p) => ({ ...p, like: prevLiked ? p.like - 1 : p.like + 1 }));
     try {
-      await call({ productId: product.id });
-      // 실제 카운트는 onSnapshot으로 따라옴
+      await toggleLike(product.id);
     } catch (e) {
-      // 실패 시 롤백
-      setLiked(v => !v);
-      console.error('Like failed:', e);
-      alert('좋아요 처리 중 오류가 발생했습니다.');
+      setLiked(prevLiked);
+      setCounts((p) => ({ ...p, like: prevCount }));
+      const msg = e instanceof Error ? e.message : 'error';
+      if (msg === 'login-required') alert('로그인이 필요합니다.');
+      else alert('좋아요 처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -92,7 +64,7 @@ export function ProductCard({ product }: { product: Product }) {
             className={`flex items-center gap-1 transition ${
               liked ? 'text-rose-500' : 'hover:text-slate-700 dark:hover:text-slate-200'
             }`}
-            onClick={toggleLike}
+            onClick={onToggle}
             aria-label="좋아요"
           >
             <Heart

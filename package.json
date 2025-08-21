@@ -5,7 +5,10 @@
   "engines": { "node": ">=20 <21", "pnpm": ">=9" },
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "pnpm type-check && pnpm lint && next build",
+    "build": "next build",
+    "codex:type-check": "npx tsc --noEmit",
+    "codex:lint": "npx next lint --max-warnings=0",
+    "codex:build": "npm run codex:type-check && npm run codex:lint && NEXT_PUBLIC_FIREBASE_API_KEY=placeholder NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=placeholder NEXT_PUBLIC_FIREBASE_PROJECT_ID=placeholder NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=placeholder NEXT_PUBLIC_FIREBASE_APP_ID=placeholder NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=placeholder NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=placeholder npx next build",
     "start": "next start -p 3000",
     "lint": "next lint --max-warnings=0",
     "format": "prettier --write .",
