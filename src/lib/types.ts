@@ -36,6 +36,7 @@ export interface Product {
   status: "draft" | "active" | "selling" | "inactive";
   isPublished: boolean;
   stockQuantity: number;
+  operatorIds: string[];
   options: {
     colors?: { nameEn: string; nameKo: string; value: string, priceDelta?: number }[];
     sizes?: { name: string; price: number; description?: string }[];

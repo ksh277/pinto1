@@ -12,7 +12,7 @@ export type Role = 'guest' | 'user' | 'seller' | 'admin';
 interface ProductContextType {
   products: Product[];
   getProductById: (id: string) => Product | undefined;
-  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'slug' | 'stats' | 'imageUrls'>) => Promise<void>;
+  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'slug' | 'stats' | 'imageUrls' | 'operatorIds'>) => Promise<void>;
   updateProduct: (product: Product) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   toggleLike: (id: string) => void;
@@ -48,6 +48,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
           id: String(Date.now()),
           slug: productData.nameKo.replace(/ /g, '-').toLowerCase(),
           imageUrls: [productData.imageUrl],
+          operatorIds: [],
           stats: {
             likeCount: 0,
             reviewCount: 0,
