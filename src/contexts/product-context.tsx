@@ -42,7 +42,9 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     return products.find(p => p.id === id);
   }, [products]);
   
-  const addProduct = async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'slug' | 'stats' | 'imageUrls'>) => {
+  const addProduct = async (
+    productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'slug' | 'stats' | 'imageUrls' | 'operatorIds'>
+  ) => {
       const newProductData: Product = {
           ...productData,
           id: String(Date.now()),

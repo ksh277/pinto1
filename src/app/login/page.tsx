@@ -67,8 +67,9 @@ export default function Login() {
     if (formData.username && formData.password) {
       try {
         await handleLogin();
-      } catch (err: any) {
-        setError(err.message ?? '로그인에 실패했습니다.');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : '로그인에 실패했습니다.';
+        setError(message);
       }
     } else {
       setError(t({ ko: "아이디 또는 비밀번호를 입력해주세요.", en: "Please enter username and password." }));
