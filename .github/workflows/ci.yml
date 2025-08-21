@@ -1,9 +1,9 @@
-name: CI
+name: CI / build
 
 on:
-  push:
-    branches: [main]
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
 
 jobs:
@@ -11,19 +11,34 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: lts/*
-          cache: pnpm
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
-      - name: Install dependencies
+          node-version: 20
+
+      - name: Enable Corepack & pin pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.12.3 --activate
+          pnpm -v
+
+      - name: Install deps
         run: pnpm install --frozen-lockfile
+
       - name: Type Check
-        run: pnpm type-check
+        run: pnpm run type-check
+
       - name: Lint
-        run: pnpm lint
+        run: pnpm run lint
+
       - name: Build
-        run: pnpm build
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: "placeholder"
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "placeholder"
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: "placeholder"
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "placeholder"
+          NEXT_PUBLIC_FIREBASE_APP_ID: "placeholder"
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "placeholder"
+          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: "placeholder"
+        run: pnpm run build

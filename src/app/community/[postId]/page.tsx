@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase.client";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
@@ -19,8 +20,8 @@ interface Attachment {
   [key: string]: unknown;
 }
 
-export default function PostDetail({ params }: { params: { postId: string } }) {
-  const { postId } = params;
+export default function PostDetail() {
+  const { postId } = useParams<{ postId: string }>();
   const [post, setPost] = useState<Post | null>(null);
   const [files, setFiles] = useState<Attachment[]>([]);
 
