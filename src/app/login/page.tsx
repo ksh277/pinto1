@@ -12,7 +12,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import type { User } from '@/lib/types';
 
 
 function KakaoIcon() {
@@ -47,18 +46,8 @@ export default function Login() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Mock login handler
-  const handleLogin = () => {
-    // In a real app, you would perform authentication here
-    const user: User = {
-        id: '1',
-        name: '홍길동',
-        username: 'gildong',
-        email: 'gildong@pinto.com',
-        nickname: '쾌남홍',
-        isAdmin: false
-    };
-    login(user);
+  const handleLogin = async () => {
+    await login(formData.username, formData.password);
     const redirectTo = redirectPath || "/";
     setRedirectPath(null);
     router.push(redirectTo);
@@ -75,24 +64,22 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setIsLoading(true);
-
-    // This is a mock login. A real implementation would call an API.
-    setTimeout(() => {
-      if (formData.username && formData.password) {
-        handleLogin();
-      } else {
-        setError(t({ ko: "아이디 또는 비밀번호를 입력해주세요.", en: "Please enter username and password."}));
-        setIsLoading(false);
+    if (formData.username && formData.password) {
+      try {
+        await handleLogin();
+      } catch (err: any) {
+        setError(err.message ?? '로그인에 실패했습니다.');
       }
-    }, 1000);
+    } else {
+      setError(t({ ko: "아이디 또는 비밀번호를 입력해주세요.", en: "Please enter username and password." }));
+    }
+    setIsLoading(false);
   };
 
   const handleSnsLogin = (_provider: "kakao" | "naver") => {
-    // Mock social login
+    // Social login not implemented
     setIsLoading(true);
-     setTimeout(() => {
-        handleLogin();
-     }, 1000);
+    handleLogin().finally(() => setIsLoading(false));
   };
 
   return (

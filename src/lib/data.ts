@@ -110,6 +110,7 @@ export const mockProducts: Product[] = MOCK_PRODUCTS_RAW.map(p => {
         status: "active",
         isPublished: true,
         stockQuantity: 100,
+        operatorIds: [],
         options: {},
         stats: {
           likeCount: p.likes ?? 0,
