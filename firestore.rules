@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /community/{postId} {
+      allow read: if true;
+
+      // 로그인한 사용자는 discussion/design_share만 생성 가능
+      allow create: if request.auth != null
+        && request.resource.data.type in ['discussion', 'design_share']
+        && request.resource.data.author.uid == request.auth.uid
+        && request.resource.data.productId is string
+        && request.resource.data.title is string
+        && request.resource.data.body is string;
+
+      // 작성자만 수정/삭제 가능
+      allow update, delete: if request.auth != null
+        && resource.data.author.uid == request.auth.uid;
+    }
+
+    match /community/{postId}/attachments/{fileId} {
+      allow read: if true;   // 공개 다운로드
+      // 글 작성자만 첨부 추가/삭제 가능
+      allow create, delete: if request.auth != null
+        && get(/databases/$(database)/documents/community/$(postId)).data.author.uid == request.auth.uid;
+    }
+  }
+}
