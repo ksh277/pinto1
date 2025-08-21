@@ -53,7 +53,7 @@ const mockGuides: Guide[] = [
 
 
 export default function ResourcesPage() {
-  const [guides, setGuides] = useState<Guide[]>(mockGuides);
+  const [guides] = useState<Guide[]>(mockGuides);
 
   // TODO: Add filtering and sorting logic
   const sortedGuides = [...guides].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());

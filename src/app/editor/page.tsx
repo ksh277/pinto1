@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, Suspense } from 'react';
 import { EditorLayout } from '@/components/editor/EditorLayout';
 import { useAuth } from '@/contexts/AuthContext';

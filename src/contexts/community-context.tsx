@@ -1,13 +1,20 @@
 
 'use client';
 
-import { createContext, useContext, type ReactNode, useMemo, useCallback, useState } from 'react';
+import { createContext, useContext, type ReactNode, useMemo, useCallback } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { Post, Comment } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 // Mock initial data with dates as strings to be serializable
-const initialPosts: (Omit<Post, 'createdAt' | 'updatedAt' | 'comments'> & { createdAt: string, updatedAt: string, comments: (Omit<Comment, 'createdAt'> & { createdAt: string })[] })[] = [
+type SerializedComment = Omit<Comment, 'createdAt'> & { createdAt: string };
+type SerializedPost = Omit<Post, 'createdAt' | 'updatedAt' | 'comments'> & {
+  createdAt: string;
+  updatedAt: string;
+  comments: SerializedComment[];
+};
+
+const initialPosts: SerializedPost[] = [
   {
     id: '1',
     author: { uid: 'user_123', nickname: 'pinto_master', avatarUrl: undefined },
@@ -35,15 +42,18 @@ const initialPosts: (Omit<Post, 'createdAt' | 'updatedAt' | 'comments'> & { crea
   },
 ];
 
-const deserializePosts = (serializedPosts: any[]): Post[] => {
-    if (!Array.isArray(serializedPosts)) return [];
-    return serializedPosts.map(p => ({
-        ...p,
-        createdAt: new Date(p.createdAt),
-        updatedAt: new Date(p.updatedAt),
-        comments: (p.comments || []).map((c: any) => ({ ...c, createdAt: new Date(c.createdAt) }))
-    }));
-}
+const deserializePosts = (serializedPosts: SerializedPost[]): Post[] => {
+  if (!Array.isArray(serializedPosts)) return [];
+  return serializedPosts.map(p => ({
+    ...p,
+    createdAt: new Date(p.createdAt),
+    updatedAt: new Date(p.updatedAt),
+    comments: (p.comments || []).map((c: SerializedComment) => ({
+      ...c,
+      createdAt: new Date(c.createdAt),
+    })),
+  }));
+};
 
 
 interface CommunityContextType {

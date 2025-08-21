@@ -23,7 +23,7 @@ const mockReviewsData: Review[] = [
 
 export default function ReviewsPage() {
   const { t } = useI18n();
-  const [reviews, setReviews] = useState<Review[]>(mockReviewsData);
+  const [reviews] = useState<Review[]>(mockReviewsData);
 
   return (
     <div className="container mx-auto px-4 py-8">

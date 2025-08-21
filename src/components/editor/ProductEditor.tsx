@@ -1,11 +1,11 @@
 
 'use client';
 
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef } from 'react';
+import Image from 'next/image';
 import type { CanvasElement, CanvasSize } from './EditorLayout';
-import { Move, RotateCw, Trash2, Maximize } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
-type DiePath = { points: {x: number, y: number}[]; closed: boolean };
 
 interface ProductEditorProps {
   canvasSize: CanvasSize;
@@ -16,7 +16,6 @@ interface ProductEditorProps {
   onDeleteElement: (id: string) => void;
   onCommitUpdate: () => void;
   canvasRef: React.RefObject<HTMLDivElement>;
-  dieLine: DiePath | null;
 }
 
 export function ProductEditor({
@@ -28,7 +27,6 @@ export function ProductEditor({
   onDeleteElement,
   onCommitUpdate,
   canvasRef,
-  dieLine,
 }: ProductEditorProps) {
   const editorAreaRef = useRef<HTMLDivElement>(null);
 
@@ -79,8 +77,8 @@ export function ProductEditor({
     const keepRatio = e.shiftKey;
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
-      let dx = moveEvent.clientX - startX;
-      let dy = moveEvent.clientY - startY;
+      const dx = moveEvent.clientX - startX;
+      const dy = moveEvent.clientY - startY;
       
       const aspect = startWidth / startHeight;
       let newWidth = startWidth + dx;
@@ -156,7 +154,7 @@ export function ProductEditor({
             }}
           >
             {el.type === 'image' && el.src && (
-              <img src={el.src} alt="" className="w-full h-full object-contain pointer-events-none" />
+              <Image src={el.src} alt="" fill className="object-contain pointer-events-none" />
             )}
             {el.type === 'text' && (
               <div

@@ -49,8 +49,8 @@ export interface Product {
     ratingSum: number;
     avgRating: number;
   };
-  createdAt: any; // Can be Date or Firestore Timestamp
-  updatedAt: any; // Can be Date or Firestore Timestamp
+    createdAt: Date | import('firebase/firestore').Timestamp; // Can be Date or Firestore Timestamp
+    updatedAt: Date | import('firebase/firestore').Timestamp; // Can be Date or Firestore Timestamp
   categoryKo?: string;
 }
 
@@ -192,9 +192,17 @@ export interface Post {
 }
 
 // Add daum to the global window interface
+interface DaumPostcodeConstructor {
+  new (options: {
+    oncomplete: (data: { address: string; zonecode: string }) => void;
+    width?: string;
+    height?: string;
+  }): { open: () => void };
+}
+
 declare global {
   interface Window {
-    daum: any;
+    daum?: { Postcode: DaumPostcodeConstructor };
   }
 }
 
@@ -210,7 +218,7 @@ export interface OrderItem {
   productId: string | null;
   name: string;
   imageUrl: string;
-  options: Record<string, any>;
+  options: Record<string, unknown>;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
@@ -239,7 +247,7 @@ export interface Order {
     status: PaymentStatus;
     provider: "portone" | string;
     transactionId: string | null;
-    paidAt: any; // Timestamp
+    paidAt: Date | import('firebase/firestore').Timestamp; // Timestamp
   };
   shipping: {
     recipient: {
@@ -253,13 +261,13 @@ export interface Order {
     carrier: string | null;
     trackingNumber: string | null;
     status: ShippingStatus;
-    estimatedDelivery: any | null; // Timestamp
-    updatedAt: any; // Timestamp
+    estimatedDelivery: Date | import('firebase/firestore').Timestamp | null; // Timestamp
+    updatedAt: Date | import('firebase/firestore').Timestamp; // Timestamp
   };
   memo?: string;
   channel: 'web' | 'app';
-  createdAt: any; // Timestamp
-  updatedAt: any; // Timestamp
+  createdAt: Date | import('firebase/firestore').Timestamp; // Timestamp
+  updatedAt: Date | import('firebase/firestore').Timestamp; // Timestamp
 }
 
 export interface Payment {
@@ -269,8 +277,8 @@ export interface Payment {
     status: 'paid'|'failed'|'refunded'|'partial_refund';
     amount: number;
     currency: 'KRW';
-    raw: Record<string, any>; // Raw webhook payload
-    capturedAt: any; // Timestamp
-    refundedAt?: any; // Timestamp
-    createdAt: any; // Timestamp
+    raw: Record<string, unknown>; // Raw webhook payload
+    capturedAt: Date | import('firebase/firestore').Timestamp; // Timestamp
+    refundedAt?: Date | import('firebase/firestore').Timestamp; // Timestamp
+    createdAt: Date | import('firebase/firestore').Timestamp; // Timestamp
 }

@@ -2,14 +2,17 @@
 'use client';
 
 import { FaqForm } from '../../faq-form';
+import type { FAQ } from '@/lib/types';
 
-const mockFaq = { 
-    id: '1', 
-    question: '결제 수단은 무엇을 지원하나요?', 
-    category: '주문/결제', 
+const mockFaq: FAQ = {
+    id: '1',
+    question: '결제 수단은 무엇을 지원하나요?',
+    category: '주문/결제',
     answer: '신용/체크카드, 간편결제(토스/카카오/네이버), 계좌이체를 지원합니다.',
-    isPublished: true, 
-    order: 1 
+    isPublished: true,
+    order: 1,
+    createdAt: new Date(),
+    updatedAt: new Date()
 };
 
 export default function EditFaqPage() {

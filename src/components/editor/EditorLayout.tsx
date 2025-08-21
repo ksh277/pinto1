@@ -1,12 +1,11 @@
 
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
-import { useParams, useSearchParams, useRouter } from "next/navigation";
+import React, { useState, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -15,7 +14,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Undo2, Redo2, Download, Save, X, Upload, Type, Square, Circle, Move, Trash2, Scissors, Image as ImageIcon, Heart, Star, Copy, ClipboardPaste, Hand
+  Undo2,
+  Redo2,
+  X,
+  Square,
+  Circle,
+  Trash2,
+  Heart,
+  Star,
+  Hand
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProductEditor } from "@/components/editor/ProductEditor";
@@ -84,7 +91,6 @@ export function EditorLayout({ productType }: EditorLayoutProps) {
   const [historyIndex, setHistoryIndex] = useState(0);
 
   // Tool state
-  const [activeUpload, setActiveUpload] = useState(false);
   const [newText, setNewText] = useState("텍스트");
   const [fontSize, setFontSize] = useState(24);
   const [fontFamily, setFontFamily] = useState("Pretendard");
@@ -106,7 +112,6 @@ export function EditorLayout({ productType }: EditorLayoutProps) {
 
   // Bottom bar state
   const [holeCount, setHoleCount] = useState(1);
-  const [holeDirection, setHoleDirection] = useState<'top' | 'bottom' | 'left' | 'right'>('top');
   const [holeSize, setHoleSize] = useState('2.5');
   const [whiteAreaOffset, setWhiteAreaOffset] = useState(1.0);
   const [isHoleDirectionOutside, setIsHoleDirectionOutside] = useState(true);
@@ -344,7 +349,7 @@ export function EditorLayout({ productType }: EditorLayoutProps) {
                 variant: 'destructive',
             });
         }
-    } catch (error) {
+    } catch {
         toast({
             title: '불러오기 실패',
             description: '디자인을 불러오는 중 오류가 발생했습니다.',
@@ -469,10 +474,7 @@ export function EditorLayout({ productType }: EditorLayoutProps) {
             <AccordionItem value="item-1">
                 <AccordionTrigger className="text-sm font-medium px-4 py-3 text-gray-300 border-b border-gray-700">자료 설정</AccordionTrigger>
                 <AccordionContent className="p-4">
-                     <SizeSelector
-                        productType={currentProductType || "keyring"}
-                        onSizeSet={handleSizeSet}
-                      />
+                     <SizeSelector onSizeSet={handleSizeSet} />
                 </AccordionContent>
             </AccordionItem>
              <AccordionItem value="item-2">
@@ -494,7 +496,7 @@ export function EditorLayout({ productType }: EditorLayoutProps) {
                        <Label htmlFor="perf-enabled" className="text-xs text-gray-300">활성화</Label>
                        <Switch id="perf-enabled" checked={perfEnabled} onCheckedChange={setPerfEnabled} disabled={!isEditorEnabled}/>
                     </div>
-                    <Select value={perfMode} onValueChange={(v) => setPerfMode(v as any)} disabled={!isEditorEnabled || !perfEnabled}>
+                    <Select value={perfMode} onValueChange={(v: 'guide' | 'export') => setPerfMode(v)} disabled={!isEditorEnabled || !perfEnabled}>
                       <SelectTrigger className="bg-gray-700 border-gray-600 text-white text-xs h-8">
                         <SelectValue />
                       </SelectTrigger>
@@ -596,7 +598,6 @@ export function EditorLayout({ productType }: EditorLayoutProps) {
                   onDeleteElement={deleteElement}
                   onCommitUpdate={commitUpdate}
                   canvasRef={canvasRef}
-                  dieLine={null}
                 />
               ) : (
                 <div className="h-full flex items-center justify-center">

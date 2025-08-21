@@ -24,7 +24,6 @@ export default function CommunityPostDetail() {
   const { getPostById, toggleLike, addComment, isLikedBy } = useCommunity();
 
   const [post, setPost] = useState<Post | null>(null);
-  const [isLiked, setIsLiked] = useState(false);
   const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
@@ -36,13 +35,6 @@ export default function CommunityPostDetail() {
     }
   }, [postId, getPostById]);
   
-  useEffect(() => {
-    if (user && post) {
-      setIsLiked(isLikedBy(post.id, user.id));
-    } else {
-      setIsLiked(false);
-    }
-  }, [user, post, isLikedBy]);
 
   const handleToggleLike = () => {
     if (!isAuthenticated || !user || !post) {

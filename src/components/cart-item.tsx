@@ -45,7 +45,7 @@ export function CartItem({ item }: CartItemProps) {
           </p>
           {item.options.customText && (
             <p>
-              <span className="font-medium text-foreground">{t('product.customText')}:</span> "{item.options.customText}"
+              <span className="font-medium text-foreground">{t('product.customText')}:</span> {item.options.customText}
             </p>
           )}
           {item.designFile && (

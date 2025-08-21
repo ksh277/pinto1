@@ -41,12 +41,18 @@ export function ProductForm({ product }: ProductFormProps) {
   const { register, handleSubmit, control, formState: { errors } } = useForm<ProductFormData>({ defaultValues });
 
   const onSubmit = (data: ProductFormData) => {
-      const productData: any = {
+      const productData: Product = {
+          ...(product || {} as Product),
           ...data,
           priceKrw: Number(data.price),
           imageUrl: data.image,
           // Temp until options UI is built
-          options: product?.options || {}, 
+          options: product?.options || {},
+          id: product?.id || '',
+          slug: product?.slug || '',
+          stats: product?.stats || { likeCount: 0, reviewCount: 0, ratingSum: 0, avgRating: 0 },
+          createdAt: product?.createdAt || new Date(),
+          updatedAt: new Date(),
       };
       
       if (product) {

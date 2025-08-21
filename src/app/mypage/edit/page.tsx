@@ -1,9 +1,9 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -32,11 +32,13 @@ type UserUpdateFormData = Partial<User> & {
 };
 
 
-function openKakaoAddressSearch(setValue: any) {
+function openKakaoAddressSearch(
+  setValue: (field: keyof UserUpdateFormData, value: string) => void,
+) {
   if (typeof window === "undefined" || !window.daum) return;
 
   new window.daum.Postcode({
-    oncomplete: function (data: any) {
+    oncomplete: function (data: { zonecode: string; address: string }) {
       setValue("zipcode", data.zonecode);
       setValue("address1", data.address);
       setValue("address2", ''); // Clear detail address
@@ -49,7 +51,7 @@ export default function EditProfilePage() {
   const { user, setUser, isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
 
-  const { register, handleSubmit, control, setValue, formState: { errors, isDirty } } = useForm<UserUpdateFormData>({
+  const { register, handleSubmit, setValue } = useForm<UserUpdateFormData>({
     defaultValues: {
       username: user?.username,
       name: user?.name,

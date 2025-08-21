@@ -1,10 +1,9 @@
 
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Paperclip } from 'lucide-react';
@@ -43,9 +42,7 @@ const statusText: Record<string, string> = {
 
 
 export default function InquiryDetailPage() {
-  const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">

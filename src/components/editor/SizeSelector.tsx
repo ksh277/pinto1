@@ -8,14 +8,13 @@ import { Label } from '@/components/ui/label';
 import type { CanvasSize } from './EditorLayout';
 
 interface SizeSelectorProps {
-  productType: string;
   onSizeSet: (size: CanvasSize) => void;
 }
 
 const DPI = 300;
 const MM_PER_INCH = 25.4;
 
-export function SizeSelector({ productType, onSizeSet }: SizeSelectorProps) {
+export function SizeSelector({ onSizeSet }: SizeSelectorProps) {
   const [width, setWidth] = useState('50');
   const [height, setHeight] = useState('50');
 

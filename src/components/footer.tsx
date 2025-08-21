@@ -1,11 +1,9 @@
 
 'use client';
 import Link from 'next/link';
-import { useI18n } from "@/contexts/i18n-context";
 import { LanguageSwitcher } from "./language-switcher";
 
 export function Footer() {
-  const { t } = useI18n();
 
   return (
     <footer className="border-t bg-secondary/50">

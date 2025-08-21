@@ -5,7 +5,7 @@ import { useEffect, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useProductContext } from '@/contexts/product-context';
-import { Home, Package, FileText, HelpCircle, MessageSquare, BookOpen } from 'lucide-react';
+import { Package, FileText, HelpCircle, MessageSquare, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [

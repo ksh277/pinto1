@@ -4,14 +4,10 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Heart } from 'lucide-react';
-import { getAuth } from 'firebase/auth';
-import {
-  doc, onSnapshot, getFirestore,
-  getDoc
-} from 'firebase/firestore';
-import { httpsCallable, getFunctions } from 'firebase/functions';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 import type { Product } from '@/lib/types';
-import { app, db, auth, functions, firebaseInitialized } from '@/lib/firebase';
+import { db, auth, functions, firebaseInitialized } from '@/lib/firebase';
 import Link from 'next/link';
 
 export function ProductCard({ product }: { product: Product }) {
@@ -25,11 +21,11 @@ export function ProductCard({ product }: { product: Product }) {
   useEffect(() => {
     if (!firebaseInitialized) return;
     const unsub = onSnapshot(doc(db, 'products', product.id), (snap) => {
-      const d = snap.data() as any;
+      const d = snap.data() as Product;
       if (!d) return;
       setCounts({
-        like: d.likeCount ?? 0,
-        review: d.reviewCount ?? 0,
+        like: d.stats?.likeCount ?? 0,
+        review: d.stats?.reviewCount ?? 0,
       });
     });
     return () => unsub();
