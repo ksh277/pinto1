@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { db } from "@/lib/firebase.client";
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { db } from '@/lib/firebase.client';
 import {
   collection,
   getDocs,
@@ -13,7 +13,7 @@ import {
   startAfter,
   QueryDocumentSnapshot,
   DocumentData,
-} from "firebase/firestore";
+} from 'firebase/firestore';
 
 interface Item {
   id: string;
@@ -26,24 +26,24 @@ const PAGE = 10;
 
 export default function PostList({ productId }: { productId: string }) {
   const [items, setItems] = useState<Item[]>([]);
-  const [cursor, setCursor] = useState<QueryDocumentSnapshot<DocumentData> | null>(
-    null
-  );
+  const [cursor, setCursor] =
+    useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
   async function load() {
     const base = [
-      where("productId", "==", productId),
-      orderBy("createdAt", "desc"),
+      where('productId', '==', productId),
+      where('status', '==', 'active'),
+      orderBy('createdAt', 'desc'),
       limit(PAGE),
     ];
     const q = cursor
-      ? query(collection(db, "community"), ...base, startAfter(cursor))
-      : query(collection(db, "community"), ...base);
+      ? query(collection(db, 'community'), ...base, startAfter(cursor))
+      : query(collection(db, 'community'), ...base);
     const snap = await getDocs(q);
     const docs = snap.docs.map((docSnap) => ({
       id: docSnap.id,
-      ...(docSnap.data() as Omit<Item, "id">),
+      ...(docSnap.data() as Omit<Item, 'id'>),
     }));
     setItems((prev) => [...prev, ...docs]);
     const last = snap.docs[snap.docs.length - 1] || null;
@@ -88,4 +88,3 @@ export default function PostList({ productId }: { productId: string }) {
     </div>
   );
 }
-
