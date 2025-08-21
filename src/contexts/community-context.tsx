@@ -7,7 +7,7 @@ import type { Post, Comment } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 // Mock initial data with dates as strings to be serializable
-const initialPosts: Omit<Post, 'createdAt' | 'updatedAt' | 'comments'> & { createdAt: string, updatedAt: string, comments: (Omit<Comment, 'createdAt'> & { createdAt: string })[] }[] = [
+const initialPosts: (Omit<Post, 'createdAt' | 'updatedAt' | 'comments'> & { createdAt: string, updatedAt: string, comments: (Omit<Comment, 'createdAt'> & { createdAt: string })[] })[] = [
   {
     id: '1',
     author: { uid: 'user_123', nickname: 'pinto_master', avatarUrl: undefined },

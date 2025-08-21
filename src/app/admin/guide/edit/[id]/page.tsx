@@ -1,7 +1,7 @@
 
 'use client';
 
-import { GuideForm } from '../guide-form';
+import { GuideForm } from '../../guide-form';
 
 const mockGuide = { 
     id: '1', 

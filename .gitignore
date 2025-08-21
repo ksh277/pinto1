@@ -1,45 +1,99 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# ─────────────────────────────────────────────────────────────────────────────
+# Dependencies / package managers
+# ─────────────────────────────────────────────────────────────────────────────
 /node_modules
 /.pnp
 .pnp.*
+# Yarn v2+ (Berry)
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+# PNPM / npm debug logs
+.pnpm-debug.log*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
 
-# vercel
-.vercel
-
-# typescript
+# ─────────────────────────────────────────────────────────────────────────────
+# Build outputs / caches
+# ─────────────────────────────────────────────────────────────────────────────
+/build
+/dist
+/.turbo
+/.parcel-cache
+/.cache
+.sass-cache
+.eslintcache
+# Typescript
 *.tsbuildinfo
+
+# Next.js
+/.next/
+/.next/cache
+/out/
 next-env.d.ts
 
-.genkit/*
-.env*
+# SWC / Babel
+.swc
 
-# firebase
+# Coverage / test
+/coverage
+/.nyc_output
+junit.xml
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Runtime / temp
+# ─────────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.pem
+*.log
+/tmp
+/temp
+
+# Vercel
+.vercel
+
+# IDE
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Env files (commit only the examples)
+# ─────────────────────────────────────────────────────────────────────────────
+# ignore all env files…
+.env
+.env.*
+# …but keep example templates in git
+!.env.example
+!.env.local.example
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Firebase / Emulator
+# ─────────────────────────────────────────────────────────────────────────────
+.firebase/
 firebase-debug.log
 firestore-debug.log
+database-debug.log
+ui-debug.log
+storage-debug.log
+
+# Cloud Functions (if used)
+functions/lib
+functions/.tsbuildinfo
+functions/node_modules
+
+# Genkit (if used)
+.genkit/*
+
+# ─────────────────────────────────────────────────────────────────────────────
+# App hosting / exports (adjust if you actually want to commit these)
+# ─────────────────────────────────────────────────────────────────────────────
+# build artifacts or exports can stay ignored by default
+docs/.cache

@@ -22,12 +22,12 @@ export default function CategoryPage() {
   const [activeSubCategory, setActiveSubCategory] = useState<ProductSubcategory | 'all'>('all');
   const [sortOrder, setSortOrder] = useState('newest');
 
-  const categoryInfo = categoriesMap[slug];
+  const categoryInfo = slug ? categoriesMap[slug] : undefined;
 
   useEffect(() => {
     const subCategory = searchParams.get('sub') as ProductSubcategory | null;
-    if (subCategory && categoryInfo?.subCategories.some(sc => sc.id === subCategory)) {
-        setActiveSubCategory(subCategory);
+  if (subCategory && categoryInfo?.subCategories.some((sc: any) => sc.id === subCategory)) {
+    setActiveSubCategory(subCategory);
     } else {
         setActiveSubCategory('all');
     }
@@ -48,9 +48,9 @@ export default function CategoryPage() {
     return [...filteredProducts].sort((a: Product, b: Product) => {
       switch (sortOrder) {
         case 'popular':
-          return (b.likeCount || 0) - (a.likeCount || 0);
+          return (b.stats?.likeCount || 0) - (a.stats?.likeCount || 0);
         case 'review':
-          return (b.reviewCount || 0) - (a.reviewCount || 0);
+          return (b.stats?.reviewCount || 0) - (a.stats?.reviewCount || 0);
         case 'price_asc':
           return a.priceKrw - b.priceKrw;
         case 'price_desc':
@@ -77,7 +77,7 @@ export default function CategoryPage() {
         >
           전체
         </Button>
-        {categoryInfo.subCategories.map(subCat => (
+  {categoryInfo.subCategories.map((subCat: any) => (
           <Button 
             key={subCat.id}
             variant="ghost" 

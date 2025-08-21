@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useProductContext } from '@/contexts/product-context';
-import { ProductForm } from '../product-form';
+import { ProductForm } from '../../product-form';
 
 export default function EditProductPage() {
   const params = useParams();

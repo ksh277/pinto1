@@ -41,7 +41,7 @@ export function CartItem({ item }: CartItemProps) {
             <span className="font-medium text-foreground">{t('product.size')}:</span> {item.options.size}
           </p>
           <p>
-            <span className="font-medium text-foreground">{t('product.color')}:</span> {locale === 'ko' ? item.options.color.name_ko : item.options.color.name_en}
+            <span className="font-medium text-foreground">{t('product.color')}:</span> {locale === 'ko' ? item.options.color.nameKo : item.options.color.nameEn}
           </p>
           {item.options.customText && (
             <p>

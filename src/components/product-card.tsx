@@ -17,8 +17,8 @@ import Link from 'next/link';
 export function ProductCard({ product }: { product: Product }) {
   const [liked, setLiked] = useState(false);
   const [counts, setCounts] = useState({
-    like: product.likeCount ?? 0,
-    review: product.reviewCount ?? 0,
+    like: product.stats?.likeCount ?? 0,
+    review: product.stats?.reviewCount ?? 0,
   });
 
   // 실시간 카운트 구독 (선택: 이미 리스트에서 값 받으면 생략 가능)

@@ -51,8 +51,8 @@ export default function EventsPage() {
   const [notices, setNotices] = useState<Notice[]>(mockNotices);
 
   const sortedNotices = [...notices].sort((a, b) => {
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
     return b.createdAt.getTime() - a.createdAt.getTime();
   });
 

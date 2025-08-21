@@ -1,7 +1,7 @@
 
 'use client';
 
-import { FaqForm } from '../faq-form';
+import { FaqForm } from '../../faq-form';
 
 const mockFaq = { 
     id: '1', 

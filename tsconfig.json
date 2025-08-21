@@ -13,14 +13,14 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+
+    // ✅ paths 사용 시 필수
+    "baseUrl": ".",                // <- 추가하세요
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+
+    "plugins": [{ "name": "next" }]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

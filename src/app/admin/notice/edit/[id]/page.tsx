@@ -1,7 +1,7 @@
 
 'use client';
 
-import { NoticeForm } from '../notice-form';
+import { NoticeForm } from '../../notice-form';
 
 const mockNotice = { 
     id: '1', 
