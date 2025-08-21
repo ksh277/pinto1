@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -44,9 +44,7 @@ const statusText: Record<string, string> = {
 
 
 export default function InquiryDetailPage() {
-  const params = useParams();
   const router = useRouter();
-  const id = params.id as string;
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -2,13 +2,8 @@
 'use client';
 
 // 타입스크립트에서 window.daum 타입 선언 (최상단에 위치)
-declare global {
-  interface Window {
-    daum: any;
-  }
-}
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,9 +32,9 @@ function isValidPassword(password: string): boolean {
 }
 
 // 카카오 주소 검색 API 연동 함수 (컴포넌트 외부에 위치)
-function openKakaoAddressSearch(setUserData: any) {
+function openKakaoAddressSearch(setUserData: Dispatch<SetStateAction<UserData>>) {
   if (typeof window === "undefined") return;
-  if (!window.daum || !window.daum.Postcode) {
+  if (!window.daum?.Postcode) {
     const script = document.createElement("script");
     script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
     script.onload = function () {
@@ -49,8 +44,8 @@ function openKakaoAddressSearch(setUserData: any) {
     return;
   }
   new window.daum.Postcode({
-    oncomplete: function (data: any) {
-      setUserData((prev: any) => ({ ...prev, address: data.address }));
+    oncomplete: function (data: { address: string }) {
+      setUserData((prev: UserData) => ({ ...prev, address: data.address }));
     },
     width: "100%",
     height: "100%",

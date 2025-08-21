@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Shield } from 'lucide-react';
 import { Button } from './ui/button';
-import { useI18n } from '@/contexts/i18n-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProductContext } from '@/contexts/product-context';
 import {

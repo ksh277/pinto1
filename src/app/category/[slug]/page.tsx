@@ -26,7 +26,7 @@ export default function CategoryPage() {
 
   useEffect(() => {
     const subCategory = searchParams.get('sub') as ProductSubcategory | null;
-  if (subCategory && categoryInfo?.subCategories.some((sc: any) => sc.id === subCategory)) {
+  if (subCategory && categoryInfo?.subCategories.some(sc => sc.id === subCategory)) {
     setActiveSubCategory(subCategory);
     } else {
         setActiveSubCategory('all');
@@ -35,7 +35,7 @@ export default function CategoryPage() {
 
   const filteredProducts = useMemo(() => {
     if (isProductsLoading) return [];
-    let categoryProducts = products.filter(p => p.categoryId === slug);
+    const categoryProducts = products.filter(p => p.categoryId === slug);
     
     if (activeSubCategory !== 'all') {
       return categoryProducts.filter(p => p.subcategory === activeSubCategory);
@@ -45,6 +45,8 @@ export default function CategoryPage() {
   }, [products, slug, activeSubCategory, isProductsLoading]);
 
   const sortedProducts = useMemo(() => {
+    const toMillis = (d: Date | import('firebase/firestore').Timestamp) =>
+      d instanceof Date ? d.getTime() : d.toDate().getTime();
     return [...filteredProducts].sort((a: Product, b: Product) => {
       switch (sortOrder) {
         case 'popular':
@@ -57,7 +59,7 @@ export default function CategoryPage() {
           return b.priceKrw - a.priceKrw;
         case 'newest':
         default:
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return toMillis(b.createdAt) - toMillis(a.createdAt);
       }
     });
   }, [filteredProducts, sortOrder]);
@@ -77,7 +79,7 @@ export default function CategoryPage() {
         >
           전체
         </Button>
-  {categoryInfo.subCategories.map((subCat: any) => (
+  {categoryInfo.subCategories.map(subCat => (
           <Button 
             key={subCat.id}
             variant="ghost" 

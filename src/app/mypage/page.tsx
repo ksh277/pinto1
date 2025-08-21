@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChevronRight, FileText, Package, RefreshCw, ShoppingCart, Truck, XCircle, MessageSquare } from 'lucide-react';
+import { ChevronRight, FileText, Package, ShoppingCart, Truck, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';

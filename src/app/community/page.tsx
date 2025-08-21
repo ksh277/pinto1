@@ -10,13 +10,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { useI18n } from '@/contexts/i18n-context';
 import { Plus, X, Image as ImageIcon, Heart, MessageCircle } from 'lucide-react';
 import type { Post } from '@/lib/types';
 import Link from 'next/link';
 
 export default function CommunityPage() {
-  const { t } = useI18n();
   const { user, isAuthenticated } = useAuth();
   const { posts, addPost } = useCommunity();
 

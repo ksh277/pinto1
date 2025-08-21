@@ -37,20 +37,24 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     const keys = key.split('.');
     const currentTranslations = translations[activeLocale] || translations['ko'];
     
-    let result: any = currentTranslations;
+    let result: unknown = currentTranslations;
     for (const k of keys) {
-      result = result?.[k];
-      if (result === undefined) {
+      if (typeof result === 'object' && result !== null && k in result) {
+        result = (result as Record<string, unknown>)[k];
+      } else {
         // Fallback to English if translation is missing
-        let fallbackResult: any = translations['en'];
+        let fallbackResult: unknown = translations['en'];
         for (const fk of keys) {
-            fallbackResult = fallbackResult?.[fk];
-            if(fallbackResult === undefined) return key;
+          if (typeof fallbackResult === 'object' && fallbackResult !== null && fk in fallbackResult) {
+            fallbackResult = (fallbackResult as Record<string, unknown>)[fk];
+          } else {
+            return key;
+          }
         }
-        return fallbackResult || key;
+        return typeof fallbackResult === 'string' ? fallbackResult : key;
       }
     }
-    return result || key;
+    return typeof result === 'string' ? result : key;
   }, [activeLocale]);
   
   const value = useMemo(() => ({ locale: activeLocale, setLocale, t }), [activeLocale, setLocale, t]);

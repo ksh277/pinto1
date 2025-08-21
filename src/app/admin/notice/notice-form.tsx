@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import type { Notice } from '@/lib/types';
 
 interface NoticeFormData {
   title: string;
@@ -18,7 +19,7 @@ interface NoticeFormData {
 }
 
 interface NoticeFormProps {
-  notice?: any; // Replace with actual Notice type
+  notice?: Notice;
 }
 
 export function NoticeForm({ notice }: NoticeFormProps) {

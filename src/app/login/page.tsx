@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertCircle, Eye, EyeOff, Shield, MessageCircle } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -87,7 +87,7 @@ export default function Login() {
     }, 1000);
   };
 
-  const handleSnsLogin = (provider: "kakao" | "naver") => {
+  const handleSnsLogin = (_provider: "kakao" | "naver") => {
     // Mock social login
     setIsLoading(true);
      setTimeout(() => {

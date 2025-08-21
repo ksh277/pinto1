@@ -48,7 +48,7 @@ const mockNotices: Notice[] = [
 ];
 
 export default function NoticePage() {
-  const [notices, setNotices] = useState<Notice[]>(mockNotices);
+  const [notices] = useState<Notice[]>(mockNotices);
   const [searchTerm, setSearchTerm] = useState('');
 
   const sortedNotices = [...notices]

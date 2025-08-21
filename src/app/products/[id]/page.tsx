@@ -5,13 +5,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useProductContext } from '@/contexts/product-context';
-import { useI18n } from '@/contexts/i18n-context';
 import { useCartContext } from '@/contexts/cart-context';
 import type { Product, Review } from '@/lib/types';
 import {
   ShoppingCart,
-  Heart,
-  Share2,
   Star,
   Plus,
   Minus,
@@ -35,8 +32,8 @@ export default function ProductDetail() {
   const router = useRouter();
   const id = params.id as string;
   const { toast } = useToast();
-  const { t, locale: language } = useLanguage();
-  const { getProductById, toggleLike } = useProductContext();
+  const { locale: language } = useLanguage();
+  const { getProductById } = useProductContext();
   const { addToCart } = useCartContext();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -53,7 +50,6 @@ export default function ProductDetail() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [activeTab, setActiveTab] = useState("pdf");
   const [customText, setCustomText] = useState("");
-  const [isFavorite, setIsFavorite] = useState(false);
 
   const productData = getProductById(id);
   
@@ -128,23 +124,23 @@ export default function ProductDetail() {
   const calculateTotalPrice = () => {
     if (!productDisplay || !product) return 0;
   
-    const sizeData = productDisplay.options.sizes?.find((s: any) => s.name === selectedSize);
+    const sizeData = productDisplay.options.sizes?.find(s => s.name === selectedSize);
     const sizePrice = sizeData?.price || product.priceKrw || 0;
     
-    const colorData = productDisplay.options.colors?.find((c: any) => c.nameKo === selectedColor);
+    const colorData = productDisplay.options.colors?.find(c => c.nameKo === selectedColor);
     const colorPrice = colorData?.priceDelta || 0;
     
-    const baseData = productDisplay.options.bases?.find((b: any) => b.name === selectedBase);
+    const baseData = productDisplay.options.bases?.find(b => b.name === selectedBase);
     const baseTypePrice = baseData?.price || 0;
     
-    const packagingData = productDisplay.options.packaging?.find((p: any) => p.name === selectedPackaging);
+    const packagingData = productDisplay.options.packaging?.find(p => p.name === selectedPackaging);
     const packagingPrice = packagingData?.price || 0;
 
     const itemPrice = sizePrice;
     const addons = colorPrice + baseTypePrice + packagingPrice;
     const subtotal = itemPrice + addons;
 
-    const quantityRange = productDisplay.options.quantityRanges?.find((r: any) => {
+    const quantityRange = productDisplay.options.quantityRanges?.find(r => {
       if (!r.range) return false;
       const [minStr, maxStr] = r.range.split(/[~-]/);
       const min = parseInt(minStr.replace(/\D/g, ""));
@@ -217,16 +213,6 @@ export default function ProductDetail() {
   }
 
 
-  const handleToggleFavorite = () => {
-    if (!product) return;
-    // TODO: Implement Firestore-based like toggle
-    // 1. Check user auth.
-    // 2. Read/write to products/{id}/likes/{uid}
-    // 3. Cloud Function will update the count, which will reflect here.
-    toggleLike(product.id);
-    setIsFavorite(prev => !prev);
-    toast({ title: isFavorite ? "찜 목록에서 제거됨" : "찜 목록에 추가됨" });
-  };
 
   const generateStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -279,7 +265,7 @@ export default function ProductDetail() {
             </div>
 
             <div className="flex space-x-2 overflow-x-auto">
-              {productDisplay.images.map((image: any, index: any) => (
+              {productDisplay.images.map((image: string, index: number) => (
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
@@ -320,7 +306,7 @@ export default function ProductDetail() {
                         <div key={categoryName}>
                             <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{categoryName} 사이즈</h4>
                             <div className="grid grid-cols-4 gap-2">
-                            {sizes.map((size: any) => (
+                              {sizes.map((size: { name: string; price: number }) => (
                                 <button
                                 key={size.name}
                                 onClick={() => setSelectedSize(size.name)}
@@ -345,7 +331,7 @@ export default function ProductDetail() {
                 <div>
                     <Label className="text-base font-medium mb-3 block text-gray-900 dark:text-white">✅ 받침 선택</Label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {productDisplay.options.bases.map((base: any) => (
+                    {productDisplay.options.bases.map(base => (
                         <button
                         key={base.name}
                         onClick={() => setSelectedBase(base.name)}
@@ -367,7 +353,7 @@ export default function ProductDetail() {
                 <div>
                   <Label className="text-base font-medium mb-3 block text-gray-900 dark:text-white">✅ 색상 선택</Label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {productDisplay.options.colors.map((color: any) => (
+                    {productDisplay.options.colors.map(color => (
                       <button
                         key={color.nameKo}
                         onClick={() => setSelectedColor(color.nameKo)}
@@ -397,7 +383,7 @@ export default function ProductDetail() {
                     <div className="bg-gray-50 dark:bg-[#1a1a1a]/50 rounded-lg p-3">
                         <div className="text-sm text-gray-600 dark:text-gray-300"><strong>수량별 할인 안내:</strong></div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-1">
-                            {productDisplay.options.quantityRanges.map((range: any) => (
+                            {productDisplay.options.quantityRanges.map(range => (
                             <div key={range.range} className="flex justify-between">
                                 <span>{range.range} ({range.condition})</span>
                                 <span className="font-medium">{range.multiplier === 1 ? "정가" : `${((1 - range.multiplier) * 100).toFixed(0)}% 할인`}</span>
@@ -412,7 +398,7 @@ export default function ProductDetail() {
                 <div>
                     <Label className="text-base font-medium mb-3 block text-gray-900 dark:text-white">✅ 포장 방식</Label>
                     <div className="grid grid-cols-2 gap-2">
-                    {productDisplay.options.packaging.map((pkg: any) => (
+                    {productDisplay.options.packaging.map(pkg => (
                         <button
                         key={pkg.name}
                         onClick={() => setSelectedPackaging(pkg.name)}
@@ -509,7 +495,7 @@ export default function ProductDetail() {
             </TabsContent>
             <TabsContent value="reviews" className="mt-8 space-y-4">
               {reviews.length > 0 ? (
-                reviews.map((r: any) => (
+                reviews.map((r: Review) => (
                   <div key={r.id} className="border p-3 rounded mb-2">
                     <p className="text-sm text-yellow-500">★ {r.rating} / 5</p>
                     <p className="text-base">{r.content}</p>

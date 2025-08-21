@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CategoryShortcuts } from '@/components/category-shortcuts';
 import { useProductContext } from '@/contexts/product-context';
+import type { Product } from '@/lib/types';
 import { ChevronRight } from 'lucide-react';
 
 const heroBanners = [
@@ -35,10 +36,10 @@ export default function Home() {
   const { products } = useProductContext();
 
   const acrylic = products.filter(p => p.categoryId === 'acrylic');
-  const wood    = products.filter(p => p.categoryId === 'wood');
-  const pool    = products.length ? products : [];
+  const wood = products.filter(p => p.categoryId === 'wood');
+  const pool: Product[] = products.length ? products : [];
 
-  const take = (arr: any[], start = 0, count = 3) =>
+  const take = (arr: Product[], start = 0, count = 3): Product[] =>
     (arr.length ? arr : pool).slice(start, start + count);
 
   const shelves = [
@@ -70,7 +71,10 @@ export default function Home() {
 
   // 좋아요 순 주간 랭킹 4개
   const top4 = [...products]
-    .sort((a: any, b: any) => (b?.likeCount ?? 0) - (a?.likeCount ?? 0))
+    .sort(
+      (a: Product, b: Product) =>
+        (b.stats?.likeCount ?? 0) - (a.stats?.likeCount ?? 0),
+    )
     .slice(0, 4);
 
   return (
@@ -144,28 +148,28 @@ export default function Home() {
               </div>
 
               <div className="mt-4 space-y-4">
-                {shelf.picks.map((p: any) => (
+                {shelf.picks.map((p: Product) => (
                   <div key={p.id} className="flex items-center gap-3">
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-neutral-200">
                       <Image
-                        src={p.imageUrl || 'https://placehold.co/300x300.png'}
-                        alt={p.nameKo || p.name || 'product'}
+                          src={p.imageUrl || 'https://placehold.co/300x300.png'}
+                          alt={p.nameKo || 'product'}
                         fill
                         sizes="64px"
                         className="object-cover"
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[12px] text-slate-500">
-                        {p.nameKo || p.name || '상품명'}
-                      </p>
+                        <p className="truncate text-[12px] text-slate-500">
+                          {p.nameKo || '상품명'}
+                        </p>
                       <div className="mt-1 text-[13px] font-semibold text-teal-600">
                         {fmtPrice(p.priceKrw)} <span className="text-teal-600/70">부터</span>
                       </div>
-                      <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-400">
-                        <span>♡ {p.likeCount ?? 0}</span>
-                        <span>리뷰 {p.reviewCount ?? 0}</span>
-                      </div>
+                        <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-400">
+                          <span>♡ {p.stats?.likeCount ?? 0}</span>
+                          <span>리뷰 {p.stats?.reviewCount ?? 0}</span>
+                        </div>
                     </div>
                   </div>
                 ))}
@@ -210,12 +214,12 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:gap-6">
-          {top4.map((p: any, i: number) => (
+            {top4.map((p: Product, i: number) => (
             <div key={p.id} className="group">
               <div className="relative h-[180px] w-full overflow-hidden rounded-2xl bg-neutral-200 sm:h-[220px] md:h-[260px]">
                 <Image
-                  src={p.imageUrl || 'https://placehold.co/600x600.png'}
-                  alt={p.nameKo || p.name || 'product'}
+                    src={p.imageUrl || 'https://placehold.co/600x600.png'}
+                    alt={p.nameKo || 'product'}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                   sizes="(max-width: 640px) 50vw, 25vw"
@@ -223,12 +227,9 @@ export default function Home() {
               </div>
 
               <div className="px-1 pt-3">
-                <p className="line-clamp-1 text-[12px] text-slate-500">
-                  작가명: {p.creatorName || p.brand || p.vendor || '작가명'}
-                </p>
-                <p className="mt-1 line-clamp-1 text-[12px] text-slate-500">
-                  {p.nameKo || p.name || '상품명'}
-                </p>
+                  <p className="line-clamp-1 text-[12px] text-slate-500">
+                    {p.nameKo || '상품명'}
+                  </p>
 
                 <div className="mt-2 flex items-center justify-between">
                   <span className="text-[13px] font-semibold text-teal-600">

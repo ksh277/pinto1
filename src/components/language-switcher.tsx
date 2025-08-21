@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useI18n, type Locale } from '@/contexts/i18n-context';
+import { useI18n } from '@/contexts/i18n-context';
 
 export function LanguageSwitcher() {
   const { setLocale, t } = useI18n();

@@ -4,9 +4,6 @@
 import { useState } from 'react';
 import type { Notice } from '@/lib/types';
 import { NoticeCard } from '@/components/notice-card';
-import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const mockNotices: Notice[] = [
   {
@@ -48,7 +45,7 @@ const mockNotices: Notice[] = [
 ];
 
 export default function EventsPage() {
-  const [notices, setNotices] = useState<Notice[]>(mockNotices);
+  const [notices] = useState<Notice[]>(mockNotices);
 
   const sortedNotices = [...notices].sort((a, b) => {
     if (a.pinned && !b.pinned) return -1;

@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import type { Guide } from '@/lib/types';
 
 interface GuideFormData {
   title: string;
@@ -20,7 +21,7 @@ interface GuideFormData {
 }
 
 interface GuideFormProps {
-  guide?: any;
+  guide?: Guide;
 }
 
 export function GuideForm({ guide }: GuideFormProps) {
