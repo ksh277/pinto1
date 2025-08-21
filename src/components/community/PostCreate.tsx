@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { auth, db, storage } from "@/lib/firebase.client";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { track } from "@/lib/analytics";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 type Kind = "discussion" | "design_share";
@@ -40,6 +41,8 @@ export default function PostCreate({ productId }: { productId: string }) {
         updatedAt: serverTimestamp(),
       });
 
+      track("create_community_post", { product_id: productId, type });
+
       // 2) 파일 업로드 (선택)
       if (files && files.length > 0) {
         for (const file of Array.from(files)) {
@@ -74,6 +77,7 @@ export default function PostCreate({ productId }: { productId: string }) {
             downloadURL: url,
             createdAt: serverTimestamp(),
           });
+          track("upload_pdf_attachment", { post_id: postRef.id });
         }
         // 첨부 개수 반영 (읽기용이라 생략해도 UX엔 큰 문제 없음)
         // await updateDoc(postRef, { attachmentCount: uploaded });
