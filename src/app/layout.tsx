@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Palette } from 'lucide-react';
 import { Providers } from '@/components/providers';
-import { Header } from '@/components/header';
+import { Header } from '@/components/site/Header';
 import { Footer } from '@/components/footer';
 import { TopBanner } from '@/components/top-banner';
 import { Toaster } from '@/components/ui/toaster';
