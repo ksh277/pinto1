@@ -12,10 +12,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
+    "incremental": true, // ← 여기 쉼표 필요!
 
     // ✅ paths 사용 시 필수
-    "baseUrl": ".",                // <- 추가하세요
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
