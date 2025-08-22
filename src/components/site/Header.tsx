@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Search, ShoppingCart } from 'lucide-react';
 import { MegaMenu } from './MegaMenu';
-import { MenuTop, menuTops } from '@/lib/categories';
+import { TopMenu, topMenus } from '@/lib/nav';
 
 /**
  * 상단 헤더와 내비게이션 바를 렌더링합니다.
@@ -13,7 +13,7 @@ import { MenuTop, menuTops } from '@/lib/categories';
  * - 키보드: ←/→ 상단 이동, ↓ 열기, Esc 닫기
  */
 export function Header() {
-  const [activeTop, setActiveTop] = useState<MenuTop | null>(null);
+  const [activeTop, setActiveTop] = useState<TopMenu | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -23,12 +23,12 @@ export function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const visibleTops = menuTops.filter(t => t.show).sort((a, b) => a.order - b.order);
+  const visibleTops = topMenus.filter(t => t.show).sort((a, b) => a.order - b.order);
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLButtonElement>,
     index: number,
-    item: MenuTop,
+    item: TopMenu,
   ) => {
     const max = visibleTops.length;
     switch (e.key) {

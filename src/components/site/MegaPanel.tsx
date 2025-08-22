@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { MegaGroup } from '@/lib/categories';
+import type { MegaGroup } from '@/lib/nav';
 
 interface MegaPanelProps {
   groups: MegaGroup[];
