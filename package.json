@@ -76,11 +76,7 @@
     "@types/request": "^2.48.13",
     "eslint": "9.33.0",
     "eslint-config-next": "15.5.0",
-<<<<<<< HEAD
     "firebase-admin": "^13.4.0",
-=======
-    "firebase-admin": "^12.0.0",
->>>>>>> 95182ea539151542f5ea7d2f83ed05e8b64c5b6a
     "genkit-cli": "^1.14.1",
     "postcss": "^8",
     "prettier": "^3.3.3",

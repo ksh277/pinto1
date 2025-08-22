@@ -75,6 +75,18 @@ export interface CartItem {
   };
 }
 
+export interface Banner {
+  id: string;
+  title: string;
+  content: string;
+  backgroundType: 'color' | 'image';
+  backgroundValue: string;
+  isOpen: boolean;
+  durationOption: 'day' | 'week';
+  createdAt: Date | import('firebase/firestore').Timestamp;
+  updatedAt: Date | import('firebase/firestore').Timestamp;
+}
+
 export interface User {
   id: string;
   email: string;
