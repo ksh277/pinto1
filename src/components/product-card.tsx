@@ -39,42 +39,43 @@ export function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <div className="group rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200 hover:shadow-md dark:bg-slate-800 dark:ring-slate-700">
-      <Link href={`/products/${product.id}`} className="block">
-        <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-700 aspect-square">
-          <Image
-            src={product.imageUrl || 'https://placehold.co/600x600.png'}
-            alt={product.nameKo}
-            fill
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-          />
-        </div>
-        <div className="mt-3 line-clamp-1 text-sm text-slate-700 dark:text-slate-300">
-          {product.nameKo}
-        </div>
-      </Link>
-
-      <div className="mt-1 flex items-center justify-between">
-        <div className="text-[15px] font-semibold text-slate-900 dark:text-slate-100">
-          {product.priceKrw?.toLocaleString()}원~
-        </div>
-        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-          <button
-            className={`flex items-center gap-1 transition ${
-              liked ? 'text-rose-500' : 'hover:text-slate-700 dark:hover:text-slate-200'
-            }`}
-            onClick={onToggle}
-            aria-label="좋아요"
-          >
-            <Heart
-              className={`h-4 w-4 ${liked ? 'fill-rose-500 text-rose-500' : ''}`}
-            />
-            {(counts.like ?? 0) > 0 && <span>{counts.like}</span>}
-          </button>
-           {(counts.review ?? 0) > 0 && <span>후기 {counts.review}</span>}
-        </div>
+    <Link
+      href={`/products/${product.id}`}
+      className="group block rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200 transition hover:scale-[1.01] hover:shadow-md dark:bg-slate-800 dark:ring-slate-700"
+    >
+      <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-700">
+        <Image
+          src={product.imageUrl || 'https://placehold.co/600x600.png'}
+          alt={product.nameKo}
+          fill
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+        />
       </div>
-    </div>
+      <div className="mt-3 line-clamp-2 text-sm text-slate-700 dark:text-slate-300">
+        {product.nameKo}
+      </div>
+      <div className="mt-1 text-[15px] font-semibold text-slate-900 dark:text-slate-100">
+        {product.priceKrw?.toLocaleString()}원~
+      </div>
+      <div className="mt-1 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+        <span>리뷰 {counts.review}</span>
+        <button
+          className={`flex items-center gap-1 transition ${
+            liked ? 'text-rose-500' : 'hover:text-slate-700 dark:hover:text-slate-200'
+          }`}
+          onClick={e => {
+            e.preventDefault();
+            onToggle();
+          }}
+          aria-label="좋아요"
+        >
+          <Heart
+            className={`h-4 w-4 ${liked ? 'fill-rose-500 text-rose-500' : ''}`}
+          />
+          <span>{counts.like}</span>
+        </button>
+      </div>
+    </Link>
   );
 }

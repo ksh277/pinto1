@@ -14,7 +14,9 @@ export function TopBanner() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     async function fetchBanner() {
+      const start = Date.now();
       try {
         const res = await fetch('/api/banners/active');
         if (!res.ok) return;
@@ -30,10 +32,13 @@ export function TopBanner() {
       } catch (e) {
         console.error(e);
       } finally {
-        setLoading(false);
+        const elapsed = Date.now() - start;
+        const delay = Math.max(300 - elapsed, 0);
+        timeout = setTimeout(() => setLoading(false), delay);
       }
     }
     fetchBanner();
+    return () => clearTimeout(timeout);
   }, []);
 
   if (loading) {

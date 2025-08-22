@@ -158,6 +158,11 @@ export interface Notice {
   attachments?: { name: string; url: string; size: number; type: string }[];
 }
 
+export interface HomeResponse {
+  recommended: Product[];
+  creatorPicks: Product[];
+}
+
 export interface FAQ {
   id: string;
   question: string;
