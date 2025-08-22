@@ -2,28 +2,20 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CategoryShortcuts } from '@/components/category-shortcuts';
 import { useProductContext } from '@/contexts/product-context';
-import type { Product } from '@/lib/types';
+import type { Product, Slide, SectionItem } from '@/lib/types';
 import { ChevronRight } from 'lucide-react';
-
-const heroBanners = [
-  { id: '1', href: '#', alt: 'Hand holding a wooden whale craft.', imgSrc: 'https://placehold.co/800x1000.png', hint: 'wooden whale craft' },
-  { id: '2', href: '#', alt: 'Custom wooden coasters with map engravings.', imgSrc: 'https://placehold.co/800x1000.png', hint: 'custom wooden coasters' },
-];
-
-const shortcutCategories = [
-  { id: '1', href: '#', label: '1인샵', imgSrc: 'https://placehold.co/100x100.png', hint: 'gift box' },
-  { id: '2', href: '#', label: '선물추천', imgSrc: 'https://placehold.co/100x100.png', hint: 'gift box' },
-  { id: '3', href: '#', label: '겨울아이디어', imgSrc: 'https://placehold.co/100x100.png', hint: 'snowflake' },
-  { id: '4', href: '#', label: '여행 굿즈', imgSrc: 'https://placehold.co/100x100.png', hint: 'luggage' },
-  { id: '5', href: '#', label: '문구/미니', imgSrc: 'https://placehold.co/100x100.png', hint: 'stationery' },
-  { id: '6', href: '#', label: '반려동물 굿즈', imgSrc: 'https://placehold.co/100x100.png', hint: 'dog paw' },
-  { id: '7', href: '#', label: '의류', imgSrc: 'https://placehold.co/100x100.png', hint: 't-shirt' },
-  { id: '8', href: '#', label: '개성 아이디어', imgSrc: 'https://placehold.co/100x100.png', hint: 'idea lightbulb' },
-];
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 
 const infoCards = [
   { id: '1', title: '나랑 가까운 오프라인샵은 어디에 있을까요?', description: '핸드폰으로 뚝딱뚝딱 빠르고 간편하게 나만의 굿즈를 만들 수 있습니다.' },
@@ -34,6 +26,13 @@ const infoCards = [
 
 export default function Home() {
   const { products } = useProductContext();
+  const [slides, setSlides] = useState<Slide[]>([]);
+  const [categories, setCategories] = useState<SectionItem[]>([]);
+
+  useEffect(() => {
+    fetch('/api/slides/active').then(res => res.json()).then(setSlides);
+    fetch('/api/section1/active').then(res => res.json()).then(setCategories);
+  }, []);
 
   const acrylic = products.filter(p => p.categoryId === 'acrylic');
   const wood = products.filter(p => p.categoryId === 'wood');
@@ -81,29 +80,43 @@ export default function Home() {
     <div className="flex flex-col bg-slate-50 dark:bg-slate-900">
       {/* HERO */}
       <section className="container mx-auto px-4 pt-8">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {heroBanners.map(banner => (
-            <Link
-              key={banner.id}
-              href={banner.href}
-              className="group relative block h-64 w-full overflow-hidden rounded-2xl md:h-[500px]"
-            >
-              <Image
-                src={banner.imgSrc}
-                alt={banner.alt}
-                fill
-                priority
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </Link>
-          ))}
-        </div>
+        {slides.length > 0 && (
+          <Carousel opts={{ loop: true }}>
+            <CarouselContent>
+              {slides.map(slide => (
+                <CarouselItem key={slide.id}>
+                  <Link
+                    href={slide.linkUrl || '#'}
+                    className="group relative block h-64 w-full overflow-hidden rounded-2xl md:h-[500px]"
+                  >
+                    <Image
+                      src={slide.imageUrl}
+                      alt={slide.title}
+                      fill
+                      priority
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </Link>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        )}
       </section>
 
       {/* SHORTCUTS */}
       <section className="container mx-auto px-4 py-12 md:py-16">
-        <CategoryShortcuts categories={shortcutCategories} />
+        <CategoryShortcuts
+          categories={categories.map(c => ({
+            id: c.id,
+            href: c.linkUrl,
+            label: c.title,
+            imgSrc: c.imageUrl,
+          }))}
+        />
       </section>
 
       {/* INFO CARDS — 작은 캡션 + 회색 박스 (글자 더 아래 / 박스 더 큼) */}
