@@ -15,6 +15,8 @@ const navItems = [
     { href: '/admin/guide', label: '이용가이드 관리', icon: BookOpen },
     { href: '/admin/inquiries', label: '1:1 문의 관리', icon: MessageSquare },
     { href: '/admin/banners', label: '배너 관리', icon: FileText },
+    { href: '/admin/slides', label: '슬라이드 관리', icon: FileText },
+    { href: '/admin/section1', label: '섹션1 관리', icon: FileText },
 ]
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

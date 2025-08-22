@@ -87,6 +87,28 @@ export interface Banner {
   updatedAt: Date | import('firebase/firestore').Timestamp;
 }
 
+export interface Slide {
+  id: string;
+  title: string;
+  imageUrl: string;
+  linkUrl: string;
+  isActive: boolean;
+  order: number;
+  createdAt: Date | import('firebase/firestore').Timestamp;
+  updatedAt: Date | import('firebase/firestore').Timestamp;
+}
+
+export interface SectionItem {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  linkUrl: string;
+  isActive: boolean;
+  order: number;
+  createdAt: Date | import('firebase/firestore').Timestamp;
+  updatedAt: Date | import('firebase/firestore').Timestamp;
+}
+
 export interface User {
   id: string;
   email: string;
