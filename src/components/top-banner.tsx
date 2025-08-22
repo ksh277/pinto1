@@ -3,63 +3,71 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import type { Banner } from '@/lib/types';
+import { cn } from '@/lib/utils';
+
+function getHideKey(id: string) {
+  return `banner_hide_${id}`;
+}
 
 export function TopBanner() {
   const [banner, setBanner] = useState<Banner | null>(null);
-  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    async function load() {
+    async function fetchBanner() {
       try {
         const res = await fetch('/api/banners/active');
         if (!res.ok) return;
-        const data = await res.json();
+        const data: Banner | null = await res.json();
         if (!data) return;
-        const hideUntil = localStorage.getItem(`banner_hide_${data.id}`);
-        if (hideUntil && new Date(hideUntil) > new Date()) {
+
+        const hideKey = getHideKey(data.id);
+        const hideUntil = localStorage.getItem(hideKey);
+        if (hideUntil && Date.now() < Number(hideUntil)) {
           return;
         }
         setBanner(data);
-      } catch (err) {
-        console.error(err);
+      } catch (e) {
+        console.error(e);
       }
     }
-    load();
+    fetchBanner();
   }, []);
 
-  const handleHide = (duration: 'day' | 'week') => {
-    if (!banner) return;
-    const days = duration === 'day' ? 1 : 7;
-    const until = new Date();
-    until.setDate(until.getDate() + days);
-    localStorage.setItem(`banner_hide_${banner.id}`, until.toISOString());
-    setHidden(true);
+  if (!banner) return null;
+
+  const handleHide = () => {
+    const ms = banner.durationOption === 'week' ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
+    const hideUntil = Date.now() + ms;
+    localStorage.setItem(getHideKey(banner.id), hideUntil.toString());
+    setBanner(null);
   };
 
-  if (!banner || hidden) return null;
-
-  const style =
-    banner.backgroundType === 'color'
-      ? { backgroundColor: banner.backgroundValue }
-      : { backgroundImage: `url(${banner.backgroundValue})`, backgroundSize: 'cover' };
+  const label = banner.durationOption === 'week' ? '일주일 간 보지 않기' : '오늘 하루 보지 않기';
 
   return (
-    <div className="w-full text-center text-white px-4 py-2" style={style}>
-      <div className="mx-auto flex max-w-screen-xl flex-col items-center gap-2 md:flex-row md:justify-center">
-        <div className="flex-1" dangerouslySetInnerHTML={{ __html: banner.content }} />
-        <div className="flex items-center gap-2 text-xs">
-          <label className="flex items-center gap-1 cursor-pointer">
-            <input type="checkbox" onChange={() => handleHide('day')} />
-            오늘 하루 보지 않기
-          </label>
-          <label className="flex items-center gap-1 cursor-pointer">
-            <input type="checkbox" onChange={() => handleHide('week')} />
-            일주일 간 보지 않기
-          </label>
-          <X className="h-4 w-4 cursor-pointer" onClick={() => setHidden(true)} />
-        </div>
+    <div
+      className={cn('w-full text-center text-sm text-white', 'px-4 py-2')}
+      style={
+        banner.backgroundType === 'color'
+          ? { backgroundColor: banner.backgroundValue }
+          : {
+              backgroundImage: `url(${banner.backgroundValue})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }
+      }
+    >
+      <div className="mx-auto flex w-full max-w-screen-xl items-center justify-center gap-2">
+        <span className="flex-1" dangerouslySetInnerHTML={{ __html: banner.content }} />
+        <label className="flex cursor-pointer items-center gap-1 whitespace-nowrap text-xs sm:text-sm">
+          <input type="checkbox" onChange={handleHide} />
+          <span>{label}</span>
+        </label>
+        <X className="h-4 w-4 cursor-pointer" onClick={() => setBanner(null)} />
       </div>
     </div>
   );
 }
+
+export default TopBanner;
 
