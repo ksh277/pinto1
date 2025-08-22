@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { MegaPanel } from './MegaPanel';
-import type { MegaGroup } from '@/lib/categories';
+import type { MegaGroup } from '@/lib/nav';
 
 interface MegaMenuProps {
   activeTopId: string | null;

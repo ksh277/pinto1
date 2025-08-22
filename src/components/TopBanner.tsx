@@ -6,11 +6,12 @@ import type { Banner } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 function getHideKey(id: string) {
-  return `banner_hide_${id}`;
+  return `pinto_top_banner_${id}_hide_until`;
 }
 
 export function TopBanner() {
   const [banner, setBanner] = useState<Banner | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchBanner() {
@@ -28,10 +29,16 @@ export function TopBanner() {
         setBanner(data);
       } catch (e) {
         console.error(e);
+      } finally {
+        setLoading(false);
       }
     }
     fetchBanner();
   }, []);
+
+  if (loading) {
+    return <div className="h-10 w-full animate-pulse bg-muted" />;
+  }
 
   if (!banner) return null;
 

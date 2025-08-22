@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { Palette } from 'lucide-react';
 import { Providers } from '@/components/providers';
 import { Header } from '@/components/site/Header';
+import { SubNav } from '@/components/SubNav';
 import { Footer } from '@/components/footer';
-import { TopBanner } from '@/components/top-banner';
+import { TopBanner } from '@/components/TopBanner';
 import { Toaster } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';
 import { Chatbot } from '@/components/chatbot';
@@ -33,6 +34,7 @@ export default function RootLayout({
           <div className="flex min-h-screen flex-col">
             <TopBanner />
             <Header />
+            <SubNav />
             <main className="flex-grow bg-background">{children}</main>
             <Footer />
           </div>
