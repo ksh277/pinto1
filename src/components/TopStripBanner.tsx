@@ -77,11 +77,13 @@ export function TopStripBanner() {
   }
 
   return (
-    <div className="w-full" role="region" aria-label="공지 배너">
-      <div
-        className={`container mx-auto flex h-11 md:h-12 items-center justify-between rounded-full px-4 md:px-5 text-xs md:text-sm shadow-sm ring-1 ring-white/40 ${getTextColor()}`}
-        style={style}
-      >
+    <div
+      role="region"
+      aria-label="공지 배너"
+      className={`w-full shadow-sm ring-1 ring-white/40 ${getTextColor()}`}
+      style={style}
+    >
+      <div className="container mx-auto flex h-11 md:h-12 items-center justify-between px-4 md:px-5 text-xs md:text-sm">
         <div className="flex-1 truncate">
           {banner.href ? (
             <Link href={banner.href} className="hover:underline">

@@ -14,7 +14,6 @@ import { HeaderAuthNav } from './header-auth-nav';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { TopStripBanner } from './TopStripBanner';
-import { usePathname } from 'next/navigation';
 
 export function Header() {
   const { t } = useI18n();
@@ -39,14 +38,12 @@ export function Header() {
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-  const pathname = usePathname();
-
   return (
     <header
       className="sticky top-0 z-50 w-full flex-col border-b bg-background shadow-sm"
       onMouseLeave={handleMouseLeave}
     >
-      {pathname === '/' && <TopStripBanner />}
+      <TopStripBanner />
       <div className="border-b hidden md:block">
         <div className="container mx-auto flex h-10 items-center justify-between px-4 text-xs">
             <div className="flex-1"></div>
