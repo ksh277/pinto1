@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Search, X, ShoppingCart, Menu } from 'lucide-react';
+import { Search, ShoppingCart, Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useI18n } from '@/contexts/i18n-context';
@@ -13,6 +13,8 @@ import { useCartContext } from '@/contexts/cart-context';
 import { HeaderAuthNav } from './header-auth-nav';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
+import { TopStripBanner } from './TopStripBanner';
+import { usePathname } from 'next/navigation';
 
 export function Header() {
   const { t } = useI18n();
@@ -32,26 +34,19 @@ export function Header() {
   const handleMouseLeave = () => {
     setActiveSubNav(null);
   };
-  
+
   const subNavToShow = mainNavItems.find(item => item.id === activeSubNav)?.subnav;
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  const pathname = usePathname();
+
   return (
-    <header 
+    <header
       className="sticky top-0 z-50 w-full flex-col border-b bg-background shadow-sm"
       onMouseLeave={handleMouseLeave}
     >
-      {/* Top bar - Hidden on mobile */}
-       <div className="bg-secondary/30 text-secondary-foreground hidden md:block">
-        <div className="container mx-auto flex h-8 items-center justify-end px-4 text-xs">
-            <div className="flex items-center gap-2">
-                <input id="hide-week" type="checkbox" className="h-3 w-3" />
-                <label htmlFor="hide-week" className="cursor-pointer">일주일 간 보지 않기</label>
-                <X className="h-3 w-3 cursor-pointer"/>
-            </div>
-        </div>
-      </div>
+      {pathname === '/' && <TopStripBanner />}
       <div className="border-b hidden md:block">
         <div className="container mx-auto flex h-10 items-center justify-between px-4 text-xs">
             <div className="flex-1"></div>

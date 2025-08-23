@@ -8,7 +8,6 @@ import { CategoryShortcuts } from '@/components/category-shortcuts';
 import { useProductContext } from '@/contexts/product-context';
 import type { Product } from '@/lib/types';
 import { ChevronRight } from 'lucide-react';
-import { TopStripBanner } from '@/components/TopStripBanner';
 
 const heroBanners = [
   { id: '1', href: '#', alt: 'Hand holding a wooden whale craft.', imgSrc: 'https://placehold.co/800x1000.png', hint: 'wooden whale craft' },
@@ -79,9 +78,7 @@ export default function Home() {
     .slice(0, 4);
 
   return (
-    <>
-      <TopStripBanner />
-      <div className="flex flex-col bg-slate-50 dark:bg-slate-900">
+    <div className="flex flex-col bg-slate-50 dark:bg-slate-900">
       {/* HERO */}
       <section className="container mx-auto px-4 pt-8">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -297,7 +294,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      </div>
-    </>
+    </div>
   );
 }
