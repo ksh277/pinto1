@@ -1,3 +1,6 @@
+// Utilities for managing banner hide state in localStorage.
+// TODO: flesh out implementations.
+
 export type Banner = {
   id: string;
   isOpen: boolean;
@@ -6,37 +9,23 @@ export type Banner = {
   message: string;
   href?: string;
   canClose: boolean;
-  createdAt?: string;
-  updatedAt?: string;
 };
 
-const PREFIX = 'pinto_banner_hide_until__';
-
-export function getHideKey(id: string): string {
-  return `${PREFIX}${id}`;
+export function buildHideKey(id: string): string {
+  // TODO: follow key format `pinto_banner_hide_until__{banner.id}`
+  return `pinto_banner_hide_until__${id}`;
 }
 
-export function getHideUntil(id: string): number | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const stored = window.localStorage.getItem(getHideKey(id));
-    return stored ? parseInt(stored, 10) : null;
-  } catch {
-    return null;
-  }
+export function getRemainingTime(_key: string): number | null {
+  // TODO: return remaining ms until the banner can reappear
+  return null;
 }
 
-export function setHideUntil(id: string, msFromNow: number): void {
-  if (typeof window === 'undefined') return;
-  try {
-    const ts = Date.now() + msFromNow;
-    window.localStorage.setItem(getHideKey(id), String(ts));
-  } catch {
-    // ignore
-  }
+export function saveHideUntil(_key: string, _expiresAt: number): void {
+  // TODO: persist expiration timestamp to localStorage
 }
 
-export function isHidden(id: string): boolean {
-  const ts = getHideUntil(id);
-  return ts !== null && ts > Date.now();
+export function isHidden(_key: string): boolean {
+  // TODO: determine if the banner should be hidden based on expiry
+  return false;
 }
