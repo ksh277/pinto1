@@ -1,299 +1,96 @@
-'use client';
+"use client";
+import useSWR from "swr";
+import TopBanner from "@/components/TopBanner";
+import { CategoryShortcuts } from "@/components/CategoryShortcuts";
+import { ProductCard, type Product } from "@/components/ProductCard";
+import { InfoCard } from "@/components/InfoCard";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { CategoryShortcuts } from '@/components/category-shortcuts';
-import { useProductContext } from '@/contexts/product-context';
-import type { Product } from '@/lib/types';
-import { ChevronRight } from 'lucide-react';
-
-const heroBanners = [
-  { id: '1', href: '#', alt: 'Hand holding a wooden whale craft.', imgSrc: 'https://placehold.co/800x1000.png', hint: 'wooden whale craft' },
-  { id: '2', href: '#', alt: 'Custom wooden coasters with map engravings.', imgSrc: 'https://placehold.co/800x1000.png', hint: 'custom wooden coasters' },
-];
-
-const shortcutCategories = [
-  { id: '1', href: '#', label: '1인샵', imgSrc: 'https://placehold.co/100x100.png', hint: 'gift box' },
-  { id: '2', href: '#', label: '선물추천', imgSrc: 'https://placehold.co/100x100.png', hint: 'gift box' },
-  { id: '3', href: '#', label: '겨울아이디어', imgSrc: 'https://placehold.co/100x100.png', hint: 'snowflake' },
-  { id: '4', href: '#', label: '여행 굿즈', imgSrc: 'https://placehold.co/100x100.png', hint: 'luggage' },
-  { id: '5', href: '#', label: '문구/미니', imgSrc: 'https://placehold.co/100x100.png', hint: 'stationery' },
-  { id: '6', href: '#', label: '반려동물 굿즈', imgSrc: 'https://placehold.co/100x100.png', hint: 'dog paw' },
-  { id: '7', href: '#', label: '의류', imgSrc: 'https://placehold.co/100x100.png', hint: 't-shirt' },
-  { id: '8', href: '#', label: '개성 아이디어', imgSrc: 'https://placehold.co/100x100.png', hint: 'idea lightbulb' },
-];
-
-const infoCards = [
-  { id: '1', title: '나랑 가까운 오프라인샵은 어디에 있을까요?', description: '핸드폰으로 뚝딱뚝딱 빠르고 간편하게 나만의 굿즈를 만들 수 있습니다.' },
-  { id: '2', title: '내 반려동물을 위한 굿즈출시', description: '일상생활용품, 반려장례용품, 추억 다양한 제품들이 준비되어 있습니다.' },
-  { id: '3', title: '커스텀 아이디어로 나만의 굿즈 판매하기', description: '핀토에서 준비한 굿즈 제품들로 나만의 디자인을 입혀 판매할 수 있습니다.' },
-  { id: '4', title: '웹툰/연예인 응원봉,포토카드,아크릴', description: '단체주문,소량부터 대량까지 핀토에게 맡겨 주세요. 직접 생산감리도 가능!' },
-];
+type HomeResponse = { recommended: Product[]; creatorPicks: Product[] };
+const fetcher = (u:string)=>fetch(u).then(r=>r.json());
 
 export default function Home() {
-  const { products } = useProductContext();
-
-  const acrylic = products.filter(p => p.categoryId === 'acrylic');
-  const wood = products.filter(p => p.categoryId === 'wood');
-  const pool: Product[] = products.length ? products : [];
-
-  const take = (arr: Product[], start = 0, count = 3): Product[] =>
-    (arr.length ? arr : pool).slice(start, start + count);
-
-  const shelves = [
-    {
-      id: 's1',
-      headline: '티셔츠 | 다양한 색상과 소재가 준비되어 있습니다.',
-      sub: '디자인이 고민이면 핀토 상담가에게 문의 주세요',
-      moreHref: '/category/apparel',
-      picks: take(acrylic, 0, 3),
-    },
-    {
-      id: 's2',
-      headline: '키링 | 스포츠, 축제, 행사, 굿즈에 많이 사용되요.',
-      sub: '칼선/재단 걱정하지 않아도 돼요. 자동편집!',
-      moreHref: '/category/acrylic',
-      picks: take(acrylic, 3, 3),
-    },
-    {
-      id: 's3',
-      headline: '우산 | 소량부터 대량까지 다양하게 준비되어 있습니다.',
-      sub: '핸드폰으로도 뚝딱 만들 수 있는 나만의 굿즈',
-      moreHref: '/category/wood',
-      picks: take(wood, 0, 3),
-    },
-  ];
-
-  const fmtPrice = (n?: number) =>
-    typeof n === 'number' ? `${n.toLocaleString()}원` : '가격문의';
-
-  // 좋아요 순 주간 랭킹 4개
-  const top4 = [...products]
-    .sort(
-      (a: Product, b: Product) =>
-        (b.stats?.likeCount ?? 0) - (a.stats?.likeCount ?? 0),
-    )
-    .slice(0, 4);
+  const { data } = useSWR<HomeResponse>("/api/products/home", fetcher);
 
   return (
-    <div className="flex flex-col bg-slate-50 dark:bg-slate-900">
-      {/* HERO */}
-      <section className="container mx-auto px-4 pt-8">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {heroBanners.map(banner => (
-            <Link
-              key={banner.id}
-              href={banner.href}
-              className="group relative block h-64 w-full overflow-hidden rounded-2xl md:h-[500px]"
-            >
-              <Image
-                src={banner.imgSrc}
-                alt={banner.alt}
-                fill
-                priority
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </Link>
-          ))}
-        </div>
-      </section>
+    <main className="py-4">
+      <TopBanner />
 
-      {/* SHORTCUTS */}
-      <section className="container mx-auto px-4 py-12 md:py-16">
-        <CategoryShortcuts categories={shortcutCategories} />
-      </section>
+      {/* 헤더 대체(임시) */}
+      <div className="my-2 flex items-center justify-between">
+        <div className="font-extrabold text-xl text-pinto-primary">PINTO</div>
+        <div className="text-sm text-gray-500">로그인 · 장바구니 · 언어</div>
+      </div>
 
-      {/* INFO CARDS — 작은 캡션 + 회색 박스 (글자 더 아래 / 박스 더 큼) */}
-      <section className="container mx-auto px-4 pt-12 md:pt-14">
-        <p className="mb-4 text-[13px] leading-5 text-slate-500">
-          온, 오프라인 어디에서나 쉽고 빠르게 만들 수 있어요!
-        </p>
-
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {infoCards.map(card => (
-            <div
-              key={card.id}
-              className="min-h-[300px] md:min-h-[340px] rounded-2xl bg-neutral-200/80 dark:bg-neutral-800/70 pt-14 md:pt-16 pb-8 px-6"
-            >
-              <h3 className="text-[15px] font-semibold leading-6 text-neutral-900 dark:text-neutral-100 break-keep">
-                {card.title}
-              </h3>
-              <p className="mt-5 text-[12px] leading-6 text-neutral-600 dark:text-neutral-300 break-keep">
-                {card.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* PRODUCT SHELF — 3열(상단 회색 배너 + 하단 미니 리스트) */}
-      <section className="container mx-auto px-4 py-10 md:py-14">
-        <h2 className="mb-4 text-[15px] font-semibold text-slate-700">
-          단체 굿즈 합리적인 가격으로 예쁘게 만들어 드릴게요.
-        </h2>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {shelves.map(shelf => (
-            <div key={shelf.id}>
-              <div className="min-h-[240px] md:min-h-[260px] rounded-2xl bg-neutral-200/80 dark:bg-neutral-800/70 pt-12 md:pt-14 pb-7 px-6">
-                <h3 className="text-[15px] font-semibold leading-6 text-neutral-900 dark:text-neutral-100 break-keep">
-                  {shelf.headline}
-                </h3>
-                <p className="mt-4 text-[12px] leading-6 text-neutral-600 dark:text-neutral-300 break-keep">
-                  {shelf.sub}
-                </p>
-              </div>
-
-              <div className="mt-4 space-y-4">
-                {shelf.picks.map((p: Product) => (
-                  <div key={p.id} className="flex items-center gap-3">
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-neutral-200">
-                      <Image
-                          src={p.imageUrl || 'https://placehold.co/300x300.png'}
-                          alt={p.nameKo || 'product'}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <p className="truncate text-[12px] text-slate-500">
-                          {p.nameKo || '상품명'}
-                        </p>
-                      <div className="mt-1 text-[13px] font-semibold text-teal-600">
-                        {fmtPrice(p.priceKrw)} <span className="text-teal-600/70">부터</span>
-                      </div>
-                        <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-400">
-                          <span>♡ {p.stats?.likeCount ?? 0}</span>
-                          <span>리뷰 {p.stats?.reviewCount ?? 0}</span>
-                        </div>
-                    </div>
-                  </div>
-                ))}
-
-                <div className="pt-1">
-                  <Button asChild variant="outline" className="h-8 w-full rounded-full border-slate-300 text-xs text-slate-600">
-                    <Link href={shelf.moreHref || '#'}>more</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 창작자 CTA (가운데 큰 텍스트/버튼) */}
-      <section className="bg-white dark:bg-card">
-        <div className="container mx-auto px-4 py-12 text-center md:py-16">
-          <h2 className="text-xl font-bold md:text-2xl">
-            창작자, 작가 모두가 참여하는 플랫폼 PINTO
-          </h2>
-          <p className="text-muted-foreground mt-2">
-            재고 걱정 없이 디자인만으로 수익을 창출하는 새로운 방법을 알아보세요.
+      {/* 히어로 */}
+      <section className="my-6 grid grid-cols-1 md:grid-cols-2 gap-6 rounded-2xl bg-pinto-soft p-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold leading-tight">
+            나만의 굿즈, 지금 바로 만들기
+          </h1>
+          <p className="mt-2 text-gray-700">
+            핀토에서 디자인부터 주문까지 한 번에. 오프라인 픽업도 지원!
           </p>
-          <div className="mt-6">
-            <Button variant="outline" className="border-gray-400">
-              판매방법 알아보기
-            </Button>
+          <div className="mt-4 flex gap-3">
+            <a href="/editor" className="rounded-2xl bg-pinto-primary text-white px-4 py-2 font-medium shadow-card">디자인 시작</a>
+            <a href="/guide" className="rounded-2xl border px-4 py-2 font-medium">이용 가이드</a>
           </div>
         </div>
+        <div className="rounded-2xl bg-white shadow-card min-h-[220px]" />
       </section>
 
-      {/* ✅ 주간 랭킹 4카드 — CTA 아래로 이동 */}
-      <section className="container mx-auto px-4 pt-6 pb-10 md:pt-8 md:pb-14">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-[15px] font-semibold text-slate-700">
-            창작자, 작가 참여 마켓 주간 랭킹보기
-          </h2>
-          <Link href="#" className="text-xs text-slate-400 hover:text-slate-600">
-            더보기 <ChevronRight className="inline-block h-3 w-3 align-middle" />
-          </Link>
-        </div>
+      {/* 카테고리 쇼트컷 */}
+      <CategoryShortcuts
+        items={[
+          { id:"acrylic-keyring", label:"아크릴키링" },
+          { id:"photocard-holder", label:"포카홀더" },
+          { id:"stand", label:"스탠드" },
+          { id:"mousepad", label:"마우스패드" },
+          { id:"sticker", label:"스티커" },
+          { id:"badge", label:"뱃지" },
+        ]}
+      />
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:gap-6">
-            {top4.map((p: Product, i: number) => (
-            <div key={p.id} className="group">
-              <div className="relative h-[180px] w-full overflow-hidden rounded-2xl bg-neutral-200 sm:h-[220px] md:h-[260px]">
-                <Image
-                    src={p.imageUrl || 'https://placehold.co/600x600.png'}
-                    alt={p.nameKo || 'product'}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                  sizes="(max-width: 640px) 50vw, 25vw"
-                />
-              </div>
-
-              <div className="px-1 pt-3">
-                  <p className="line-clamp-1 text-[12px] text-slate-500">
-                    {p.nameKo || '상품명'}
-                  </p>
-
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-[13px] font-semibold text-teal-600">
-                    {fmtPrice(p.priceKrw)} <span className="text-teal-600/70">부터</span>
-                  </span>
-                  <span className="rounded-md border-2 border-rose-200 px-2 py-[2px] text-[10px] font-semibold text-rose-300">
-                    BEST {i + 1}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* 추천상품 #1 */}
+      <section className="my-6">
+        <div className="mb-3 text-lg font-semibold">추천 상품</div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {(data?.recommended ?? Array.from({length:8})).map((p: any, i:number) =>
+            p ? <ProductCard key={p.id} product={p} /> :
+            <div key={i} className="rounded-2xl bg-gray-100 aspect-square animate-pulse" />
+          )}
         </div>
       </section>
 
-      {/* 하단 3 CTA 카드 */}
-      <section className="bg-white dark:bg-card">
-        <div className="container mx-auto px-4 pb-14 pt-6 md:pb-20 md:pt-10">
-          <h3 className="mb-4 text-[13px] font-medium text-slate-600">
-            함께 성장해요. 고객별 혜택 확인하기
-          </h3>
+      {/* 인포 카드 */}
+      <section className="my-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <InfoCard title="가까운 오프라인샵" description="핸드폰으로 빠르게 주문하고, 오늘 바로 픽업하세요." href="/shops" />
+        <InfoCard title="첫 주문 가이드" description="이미지 규격, 재단선, 배송까지 한 번에 확인." href="/guide" />
+        <InfoCard title="제작 문의" description="대량/커스텀 문의는 전용 채널로 편하게." href="/contact" />
+      </section>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
-            <Card className="rounded-2xl border-none bg-neutral-200/80 p-0 shadow-none dark:bg-neutral-800/70">
-              <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-8 text-center md:min-h-[180px]">
-                <h4 className="text-base font-bold">창작마켓</h4>
-                <p className="mt-1 text-xs text-slate-500">B2C 참여하기</p>
-              </div>
-              <div className="px-6 pb-6 text-center">
-                <p className="text-[12px] leading-6 text-slate-500">
-                  나만의 작품으로 굿즈를 제작, 등록하여 판매할 수 있습니다.
-                  창작물 판매여부에는 소정의 판매 수수료가 반영이 됩니다.
-                </p>
-              </div>
-            </Card>
-
-            <Card className="rounded-2xl border-none bg-neutral-200/80 p-0 shadow-none dark:bg-neutral-800/70">
-              <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-8 text-center md:min-h-[180px]">
-                <h4 className="text-base font-bold">관공서, 기업, 대량</h4>
-                <p className="mt-1 text-xs text-slate-500">B2B 문의하기</p>
-              </div>
-              <div className="px-6 pb-6 text-center">
-                <p className="text-[12px] leading-6 text-slate-500">
-                  행사/축제/교육/대량 굿즈 제작이 가능합니다. 핀토는 자체 공장과
-                  다양한 프로젝트로 풍부하여 전문 상담가가 함께 합니다.
-                </p>
-              </div>
-            </Card>
-
-            <Card className="rounded-2xl border-none bg-neutral-200/80 p-0 shadow-none dark:bg-neutral-800/70">
-              <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-8 text-center md:min-h-[180px]">
-                <h4 className="text-base font-bold">개인</h4>
-                <p className="mt-1 text-xs text-slate-500">B2C 문의하기</p>
-              </div>
-              <div className="px-6 pb-6 text-center">
-                <p className="text-[12px] leading-6 text-slate-500">
-                  구매량 등급이 나눠져 있어 구매금액에 따라 월 할인 프로모션,
-                  포인트 지급 등이 제공됩니다.
-                </p>
-              </div>
-            </Card>
-          </div>
+      {/* 추천상품 #2 */}
+      <section className="my-6">
+        <div className="mb-3 text-lg font-semibold">크리에이터 픽</div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {(data?.creatorPicks ?? Array.from({length:4})).map((p:any, i:number) =>
+            p ? <ProductCard key={p.id} product={p} /> :
+            <div key={i} className="rounded-2xl bg-gray-100 aspect-square animate-pulse" />
+          )}
         </div>
       </section>
-    </div>
+
+      {/* 하단 CTA */}
+      <section className="my-8 rounded-2xl bg-pinto-accent p-6 text-center">
+        <h2 className="text-xl md:text-2xl font-bold">지금 바로 디자인을 시작해볼까요?</h2>
+        <a href="/editor" className="mt-3 inline-block rounded-2xl bg-black text-white px-5 py-2 font-medium shadow-card">
+          시작하기
+        </a>
+      </section>
+
+      {/* 푸터(간단) */}
+      <footer className="my-6 py-6 text-sm text-gray-500 border-t">
+        © {new Date().getFullYear()} PINTO. All rights reserved.
+      </footer>
+    </main>
   );
 }
