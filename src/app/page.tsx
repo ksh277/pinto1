@@ -8,11 +8,18 @@ import { CategoryShortcuts } from '@/components/category-shortcuts';
 import { useProductContext } from '@/contexts/product-context';
 import type { Product } from '@/lib/types';
 import { ChevronRight } from 'lucide-react';
+import { TopStripBanner } from '@/components/TopStripBanner';
+import { Header } from '@/components/header';
 
 const heroBanners = [
   { id: '1', href: '#', alt: 'Hand holding a wooden whale craft.', imgSrc: 'https://placehold.co/800x1000.png', hint: 'wooden whale craft' },
   { id: '2', href: '#', alt: 'Custom wooden coasters with map engravings.', imgSrc: 'https://placehold.co/800x1000.png', hint: 'custom wooden coasters' },
 ];
+function HeroSection({ banners: _banners }: { banners: typeof heroBanners }) {
+  // TODO: full-bleed hero layout goes here
+  return null;
+}
+
 
 const shortcutCategories = [
   { id: '1', href: '#', label: '1인샵', imgSrc: 'https://placehold.co/100x100.png', hint: 'gift box' },
@@ -77,29 +84,15 @@ export default function Home() {
     )
     .slice(0, 4);
 
-  return (
-    <div className="flex flex-col bg-slate-50 dark:bg-slate-900">
-      {/* HERO */}
-      <section className="container mx-auto px-4 pt-8">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {heroBanners.map(banner => (
-            <Link
-              key={banner.id}
-              href={banner.href}
-              className="group relative block h-64 w-full overflow-hidden rounded-2xl md:h-[500px]"
-            >
-              <Image
-                src={banner.imgSrc}
-                alt={banner.alt}
-                fill
-                priority
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </Link>
-          ))}
-        </div>
-      </section>
+  return (<>
+  <TopStripBanner />
+  <Header />
+  <div className="flex flex-col bg-slate-50 dark:bg-slate-900">
+    {/* HERO */}
+    <section className="full-bleed">
+      <HeroSection banners={heroBanners} />
+    </section>
+
 
       {/* SHORTCUTS */}
       <section className="container mx-auto px-4 py-12 md:py-16">
@@ -294,6 +287,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
     </div>
+  </>
+
   );
 }

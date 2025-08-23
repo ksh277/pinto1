@@ -1,22 +1,9 @@
-import { Banner } from '@/lib/banner';
+// Placeholder API route that will eventually return the active banner.
+// TODO: implement fetching logic and proper response typing.
 
-export const runtime = 'nodejs';
-export const revalidate = 0;
+import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const banner: Banner = {
-    id: 'home-20250823',
-    isOpen: true,
-    bgType: 'gradient',
-    bgValue: 'linear-gradient(90deg, #0ea5e9 0%, #22c55e 100%)',
-    message: "나만의 굿즈 메이킹 ‘PINTO’ OPEN EVENT ｜ 카카오톡 플친 500Point",
-    href: '/event/open',
-    canClose: true,
-  };
-
-  return Response.json(banner, {
-    headers: {
-      'Cache-Control': 'no-store',
-    },
-  });
+  // TODO: fetch active banner and return JSON
+  return NextResponse.json(null, { status: 200 });
 }
