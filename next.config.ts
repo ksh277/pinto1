@@ -1,5 +1,4 @@
-
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -16,7 +15,7 @@ const nextConfig: NextConfig = {
         hostname: 'firebasestorage.googleapis.com',
         port: '',
         pathname: '/**',
-      }
+      },
     ],
   },
   webpack: (config) => {
@@ -26,6 +25,7 @@ const nextConfig: NextConfig = {
     config.resolve.alias['genkit'] = false;
     config.resolve.alias['dotprompt'] = false;
     config.resolve.alias['handlebars'] = false;
+    config.resolve.alias['canvas'] = false;
     return config;
   },
 };
