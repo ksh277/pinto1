@@ -5,7 +5,8 @@ import { Palette } from 'lucide-react';
 import { Providers } from '@/components/providers';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster as RadixToaster } from '@/components/ui/toaster';
+import { Toaster as HotToaster } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Chatbot } from '@/components/chatbot';
 import './globals.css';
@@ -34,7 +35,8 @@ export default function RootLayout({
             <main className="flex-grow bg-background">{children}</main>
             <Footer />
           </div>
-          <Toaster />
+          <RadixToaster />
+          <HotToaster />
           <div className="fixed bottom-6 left-6 z-50">
             <Button asChild size="lg" className="rounded-full shadow-lg">
               <Link href="/editor">
