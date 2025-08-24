@@ -90,18 +90,6 @@ export function Header() {
             <Image src={require('./img/logo.png')} width={150} height={30} alt="logo" className="object-contain" />
           </Link>
 
-          <div className="hidden md:flex items-center gap-6">
-            <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
-              <Link href="/reviews">{t('header.nav.reviews')}</Link>
-            </Button>
-            <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
-              <Link href="/community">{t('header.nav.community')}</Link>
-            </Button>
-            <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
-              <Link href="/editor">굿즈 에디터</Link>
-            </Button>
-          </div>
-
           {/* 모바일 아이콘 */}
           <div className="flex items-center md:hidden">
             <Button variant="ghost" size="icon" asChild>
