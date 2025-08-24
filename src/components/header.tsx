@@ -1,7 +1,7 @@
-
 'use client';
 
 import React, { useState } from 'react';
+import clsx from 'clsx';
 import Link from 'next/link';
 import { Search, ShoppingCart, Menu } from 'lucide-react';
 import { Button } from './ui/button';
@@ -19,61 +19,62 @@ export function Header() {
   const { t } = useI18n();
   const [activeSubNav, setActiveSubNav] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const { cartCount } = useCartContext();
 
-  const handleMouseEnter = (itemId: string) => {
-    const item = mainNavItems.find(i => i.id === itemId);
-    if (item && item.subnav) {
-      setActiveSubNav(itemId);
-    } else {
-      setActiveSubNav(null);
-    }
+  const handleCategoryHover = (cat: string) => {
+    setActiveCategory(cat);
+    const item = mainNavItems.find(i => i.id === cat);
+    setActiveSubNav(item?.subnav ? cat : null);
   };
 
-  const handleMouseLeave = () => {
+  const handleCategoryLeave = () => {
     setActiveSubNav(null);
   };
 
-  const subNavToShow = mainNavItems.find(item => item.id === activeSubNav)?.subnav;
+  const handleCategoryClick = (cat: string) => {
+    setActiveCategory(cat);
+    const item = mainNavItems.find(i => i.id === cat);
+    setActiveSubNav(item?.subnav ? cat : null);
+  };
 
+  const subNavToShow = mainNavItems.find(item => item.id === activeSubNav)?.subnav;
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <header
-      className="sticky top-0 z-50 w-full flex-col border-b bg-background shadow-sm"
-      onMouseLeave={handleMouseLeave}
-    >
+    <header className="sticky top-0 z-50 w-full flex-col border-b bg-background shadow-sm" onMouseLeave={handleCategoryLeave}>
       <TopStripBanner />
+
+      {/* 상단 유틸 바 */}
       <div className="border-b hidden md:block">
         <div className="container mx-auto flex h-10 items-center justify-between px-4 text-xs">
-            <div className="flex-1"></div>
-            <div className="flex flex-1 items-center justify-center gap-4 text-muted-foreground">
-                 <Link href="/support/notice" className="hover:underline">공지사항</Link>
-                 <Link href="/support/faq" className="hover:underline">고객센터</Link>
-                 <Link href="/support/guide" className="hover:underline">이용가이드</Link>
-                 <Link href="/events" className="hover:underline">이벤트</Link>
-                 <Link href="/mypage/inquiries" className="hover:underline">문의게시판</Link>
-                 <Link href="/resources" className="hover:underline">자료실</Link>
-            </div>
-            <div className="flex flex-1 items-center justify-end gap-4 text-muted-foreground">
-              <HeaderAuthNav />
-              <div className="h-4 w-px bg-gray-200" />
-              <Link href="/cart" className="flex items-center gap-1 hover:text-primary">
-                <ShoppingCart className="h-4 w-4" />
-                <span>장바구니 ({cartCount})</span>
-              </Link>
-            </div>
+          <div className="flex-1" />
+          <div className="flex flex-1 items-center justify-center gap-4 text-muted-foreground">
+            <Link href="/support/notice" className="hover:underline">공지사항</Link>
+            <Link href="/support/faq" className="hover:underline">고객센터</Link>
+            <Link href="/support/guide" className="hover:underline">이용가이드</Link>
+            <Link href="/events" className="hover:underline">이벤트</Link>
+            <Link href="/mypage/inquiries" className="hover:underline">문의게시판</Link>
+            <Link href="/resources" className="hover:underline">자료실</Link>
+          </div>
+          <div className="flex flex-1 items-center justify-end gap-4 text-muted-foreground">
+            <HeaderAuthNav />
+            <div className="h-4 w-px bg-gray-200" />
+            <Link href="/cart" className="flex items-center gap-1 hover:text-primary">
+              <ShoppingCart className="h-4 w-4" />
+              <span>장바구니 ({cartCount})</span>
+            </Link>
+          </div>
         </div>
       </div>
-      
-  <div className="w-full">
-        {/* Main Header (Full width) */}
+
+      {/* 메인 헤더 */}
+      <div className="w-full">
         <div className="flex h-20 items-center justify-between w-full px-0">
           <Link href="/" className="flex items-center gap-2 text-3xl font-bold ml-8">
             <Image src={require('./img/logo.png')} width={150} height={30} alt="logo" className="object-contain" />
           </Link>
 
-          {/* Desktop Main Nav */}
           <div className="hidden md:flex items-center gap-6">
             <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
               <Link href="/reviews">{t('header.nav.reviews')}</Link>
@@ -83,7 +84,7 @@ export function Header() {
             </Button>
           </div>
 
-          {/* Mobile Search */}
+          {/* 모바일 아이콘 */}
           <div className="flex items-center md:hidden">
             <Button variant="ghost" size="icon" asChild>
               <Link href="/search">
@@ -93,7 +94,7 @@ export function Header() {
             </Button>
           </div>
 
-          {/* Mobile Actions */}
+          {/* 모바일 장바구니 + 메뉴 */}
           <div className="flex items-center gap-2 md:hidden">
             <Button variant="ghost" size="icon" asChild>
               <Link href="/cart">
@@ -119,78 +120,112 @@ export function Header() {
                 <div className="mt-6 flex flex-col h-full">
                   <div className="pb-4 border-b">
                     <HeaderAuthNav />
-                         </div>
-                         <nav className="mt-6 flex-grow">
-                             <Accordion type="multiple" className="w-full">
-                                {mainNavItems.map((item) => (
-                                   <AccordionItem value={item.id} key={item.id}>
-                                       <AccordionTrigger className="text-base font-semibold py-3 hover:no-underline">
-                                           <Link href={item.href} onClick={!item.subnav ? closeMobileMenu : (e) => e.preventDefault()} className="flex-1 text-left">{item.label}</Link>
-                                       </AccordionTrigger>
-                                       {item.subnav && (
-                                            <AccordionContent className="pb-1 pl-4">
-                                                <div className="flex flex-col items-start gap-1">
-                                                    {item.subnav.map(subItem => (
-                                                        <Button key={subItem.label} variant="link" asChild className="h-auto p-1 text-muted-foreground">
-                                                            <Link href={subItem.href} onClick={closeMobileMenu}>{subItem.label}</Link>
-                                                        </Button>
-                                                    ))}
-                                                </div>
-                                            </AccordionContent>
-                                       )}
-                                   </AccordionItem>
+                  </div>
+                  <nav className="mt-6 flex-grow">
+                    <Accordion type="multiple" className="w-full">
+                      {mainNavItems.map((item) => (
+                        <AccordionItem value={item.id} key={item.id}>
+                          <AccordionTrigger className="text-base font-semibold py-3 hover:no-underline">
+                            <Link href={item.href} onClick={!item.subnav ? closeMobileMenu : (e) => e.preventDefault()} className="flex-1 text-left">
+                              {item.label}
+                            </Link>
+                          </AccordionTrigger>
+                          {item.subnav && (
+                            <AccordionContent className="pb-1 pl-4">
+                              <div className="flex flex-col items-start gap-1">
+                                {item.subnav.map(subItem => (
+                                  <Button key={subItem.label} variant="link" asChild className="h-auto p-1 text-muted-foreground">
+                                    <Link href={subItem.href} onClick={closeMobileMenu}>{subItem.label}</Link>
+                                  </Button>
                                 ))}
-                                 <div className="border-t">
-                                     <Link href="/reviews" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">리뷰</Link>
-                                 </div>
-                                  <div className="border-t">
-                                     <Link href="/community" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">커뮤니티</Link>
-                                 </div>
-                                  <div className="border-t">
-                                     <Link href="/support/notice" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">고객센터</Link>
-                                 </div>
-                             </Accordion>
-                         </nav>
-                      </div>
-                  </SheetContent>
-                </Sheet>
-            </div>
+                              </div>
+                            </AccordionContent>
+                          )}
+                        </AccordionItem>
+                      ))}
+                      <div className="border-t"><Link href="/reviews" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">리뷰</Link></div>
+                      <div className="border-t"><Link href="/community" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">커뮤니티</Link></div>
+                      <div className="border-t"><Link href="/support/notice" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">고객센터</Link></div>
+                    </Accordion>
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
 
-        {/* Desktop Category Navigation + Search (Full width) */}
-  <div className="hidden md:flex h-12 items-center w-full px-0 justify-between">
-          <div className="flex flex-1 items-center gap-12 w-0 min-w-0 overflow-x-auto justify-end pr-10">
-            {mainNavItems.map((item) => (
-              <div key={item.id} onMouseEnter={() => handleMouseEnter(item.id)}>
-                <Button variant="ghost" asChild className="font-semibold text-base text-foreground hover:text-primary px-2 py-1 whitespace-nowrap">
-                  <Link href={item.href}>{item.label}</Link>
-                </Button>
-              </div>
+        {/* 카테고리 네비 + 검색 */}
+        <div className="hidden md:flex h-14 items-center w-full justify-between">
+          <ul className="flex items-center gap-12 ml-16 list-none">
+            {[
+              { id: 'all', label: 'ALL' },
+              { id: 'acrylic', label: '아크릴' },
+              { id: 'paper', label: '지류' },
+              { id: 'sticker', label: '스티커' },
+              { id: 'clothing', label: '의류' },
+              { id: 'frame', label: '액자' },
+              { id: 'stationery', label: '문구/오피스' },
+              { id: 'ipgoods', label: 'IP굿즈 상품개발' },
+              { id: 'kit', label: '기업/웰컴 키트' },
+              { id: 'group', label: '단체 판촉' },
+            ].map((item, index) => (
+              <li key={index}>
+                <button
+                  className={clsx(
+                    'relative px-2 py-1 text-base font-semibold transition-colors',
+                    activeCategory === item.id
+                      ? 'text-primary after:absolute after:-bottom-1 after:left-0 after:right-0 after:h-[2px] after:bg-primary'
+                      : 'text-muted-foreground hover:text-primary'
+                  )}
+                  onMouseEnter={() => handleCategoryHover(item.id!)}
+                  onMouseLeave={handleCategoryLeave}
+                  onClick={() => handleCategoryClick(item.id!)}
+                >
+                  {item.label}
+                </button>
+              </li>
             ))}
-          </div>
-          <div className="flex-shrink-0 w-[480px] max-w-[40vw] ml-8 mr-8">
+          </ul>
+
+          <div className="flex-shrink-0 w-[600px] max-w-[600px] mr-16">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="2,000여개의 커스텀 상품을 쉽게 찾아 보세요."
-                className="w-full rounded-full border-2 border-primary bg-background py-2 pl-12 pr-4 text-base"
+                className="w-full rounded-full border-2 border-primary bg-background py-2 pl-10 pr-4 text-base"
               />
             </div>
           </div>
         </div>
       </div>
-       {subNavToShow && (
-        <div className="hidden md:block border-t bg-background shadow-md">
-            <div className="container mx-auto px-4">
-                <div className="flex h-12 items-center justify-center gap-x-6 gap-y-2 text-sm">
-                    {subNavToShow.map((subItem) => (
-                        <Button key={subItem.label} variant="ghost" size="sm" asChild className="font-medium text-muted-foreground hover:text-primary">
-                           <Link href={subItem.href}>{subItem.label}</Link>
-                        </Button>
-                    ))}
-                </div>
+
+      {/* 서브 네비 */}
+      {subNavToShow && (
+        activeSubNav === 'all' ? (
+          <div className="hidden md:block border-t bg-background shadow-md w-screen left-0 fixed z-40" style={{ top: '218px' }}>
+            <div className="w-full px-8 py-8">
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-6 w-full">
+                {subNavToShow.map((subItem) => (
+                  <Button key={subItem.label} variant="ghost" size="sm" asChild className="font-medium text-muted-foreground hover:text-primary justify-start text-left whitespace-nowrap">
+                    <Link href={subItem.href}>{subItem.label}</Link>
+                  </Button>
+                ))}
+              </div>
             </div>
-        </div>
+          </div>
+        ) : (
+          <div className="hidden md:block border-t bg-background shadow-md">
+            <div className="container mx-auto px-4">
+              <div className="flex h-12 items-center justify-center gap-x-6 gap-y-2 text-sm">
+                {subNavToShow.map((subItem) => (
+                  <Button key={subItem.label} variant="ghost" size="sm" asChild className="font-medium text-muted-foreground hover:text-primary">
+                    <Link href={subItem.href}>{subItem.label}</Link>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
       )}
     </header>
   );

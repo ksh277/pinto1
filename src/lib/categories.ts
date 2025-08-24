@@ -41,7 +41,21 @@ const packagingSubNav: SubCategory[] = [
   { href: '/category/packaging?sub=packaging', label: '포장재', id: 'packaging' },
 ];
 
+// ALL subcategories for mega menu
+const allSubNav: SubCategory[] = [
+  ...acrylicSubNav,
+  ...woodSubNav,
+  ...packagingSubNav,
+  // 추가적으로 다른 카테고리 subnav도 여기에 합칠 수 있음
+];
+
 export const mainNavItems: MainCategory[] = [
+  {
+    id: 'all',
+    href: '#',
+    label: 'ALL',
+    subnav: allSubNav
+  },
   { 
     id: 'acrylic',
     href: '/category/acrylic', 
