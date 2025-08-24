@@ -83,18 +83,22 @@ export function TopStripBanner() {
       className={`w-full shadow-sm ring-1 ring-white/40 ${getTextColor()}`}
       style={style}
     >
-      <div className="container mx-auto flex h-11 md:h-12 items-center justify-between px-4 md:px-5 text-xs md:text-sm">
-        <div className="flex-1 truncate">
-          {banner.href ? (
-            <Link href={banner.href} className="hover:underline">
-              {banner.message}
-            </Link>
-          ) : (
-            <span>{banner.message}</span>
-          )}
+      <div className="flex w-full h-11 md:h-12 items-center justify-center px-0 text-xs md:text-sm relative">
+        {/* 중앙 메시지 */}
+        <div className="w-full flex items-center justify-center absolute left-0 top-0 h-full pointer-events-none">
+          <span className="font-semibold text-center w-full block pointer-events-auto">
+            {banner.href ? (
+              <Link href={banner.href} className="hover:underline">
+                {banner.message || '나만의 굿즈 메이킹'}
+              </Link>
+            ) : (
+              <span>{banner.message || '나만의 굿즈 메이킹'}</span>
+            )}
+          </span>
         </div>
+        {/* 오른쪽: 일주일간 보지 않기 & 닫기 */}
         {banner.canClose && (
-          <div className="ml-4 flex items-center gap-2 whitespace-nowrap">
+          <div className="flex items-center gap-2 whitespace-nowrap absolute right-4 md:right-5 top-1/2 -translate-y-1/2 bg-transparent z-10">
             <input
               id="hide7d"
               type="checkbox"

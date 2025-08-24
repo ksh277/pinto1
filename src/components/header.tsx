@@ -66,58 +66,59 @@ export function Header() {
         </div>
       </div>
       
-      <div className="container mx-auto px-4">
-        {/* Main Header */}
-        <div className="flex h-20 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 text-3xl font-bold">
-                <Image src="https://placehold.co/150x30.png" width={150} height={30} alt="logo" className="object-contain" />
-            </Link>
+  <div className="w-full">
+        {/* Main Header (Full width) */}
+        <div className="flex h-20 items-center justify-between w-full px-0">
+          <Link href="/" className="flex items-center gap-2 text-3xl font-bold ml-8">
+            <Image src={require('./img/logo.png')} width={150} height={30} alt="logo" className="object-contain" />
+          </Link>
 
-            {/* Desktop Main Nav */}
-            <div className="hidden md:flex items-center gap-6">
-                <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
-                  <Link href="/reviews">{t('header.nav.reviews')}</Link>
+          {/* Desktop Main Nav */}
+          <div className="hidden md:flex items-center gap-6">
+            <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
+              <Link href="/reviews">{t('header.nav.reviews')}</Link>
+            </Button>
+            <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
+              <Link href="/community">{t('header.nav.community')}</Link>
+            </Button>
+          </div>
+
+          {/* Mobile Search */}
+          <div className="flex items-center md:hidden">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/search">
+                <Search className="h-6 w-6" />
+                <span className="sr-only">검색</span>
+              </Link>
+            </Button>
+          </div>
+
+          {/* Mobile Actions */}
+          <div className="flex items-center gap-2 md:hidden">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/cart">
+                <ShoppingCart className="h-6 w-6" />
+                <span className="sr-only">장바구니</span>
+              </Link>
+            </Button>
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">메뉴 열기</span>
                 </Button>
-                 <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
-                  <Link href="/community">{t('header.nav.community')}</Link>
-                </Button>
-            </div>
-            
-            {/* Desktop Search */}
-            <div className="relative w-full max-w-md hidden md:block">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="2,000여개의 커스텀 상품을 쉽게 찾아 보세요."
-                className="w-full rounded-full border-2 border-primary bg-background py-2 pl-12 pr-4"
-              />
-            </div>
-            
-            {/* Mobile Actions */}
-            <div className="flex items-center gap-2 md:hidden">
-                 <Button variant="ghost" size="icon" asChild>
-                    <Link href="/cart">
-                        <ShoppingCart className="h-6 w-6" />
-                        <span className="sr-only">장바구니</span>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-full max-w-sm">
+                <SheetHeader>
+                  <SheetTitle>
+                    <Link href="/" onClick={closeMobileMenu}>
+                      <Image src={require('./img/logo.png')} width={150} height={30} alt="logo" />
                     </Link>
-                </Button>
-                <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                        <Menu className="h-6 w-6" />
-                        <span className="sr-only">메뉴 열기</span>
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-full max-w-sm">
-                      <SheetHeader>
-                          <SheetTitle>
-                            <Link href="/" onClick={closeMobileMenu}>
-                                <Image src="https://placehold.co/150x30.png" width={150} height={30} alt="logo" />
-                            </Link>
-                          </SheetTitle>
-                      </SheetHeader>
-                      <div className="mt-6 flex flex-col h-full">
-                         <div className="pb-4 border-b">
-                             <HeaderAuthNav />
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-6 flex flex-col h-full">
+                  <div className="pb-4 border-b">
+                    <HeaderAuthNav />
                          </div>
                          <nav className="mt-6 flex-grow">
                              <Accordion type="multiple" className="w-full">
@@ -156,15 +157,26 @@ export function Header() {
             </div>
         </div>
 
-        {/* Desktop Category Navigation */}
-        <div className="hidden h-12 items-center justify-start gap-6 border-t md:flex">
-          {mainNavItems.map((item) => (
-            <div key={item.id} onMouseEnter={() => handleMouseEnter(item.id)}>
-              <Button variant="ghost" asChild className="font-semibold text-foreground hover:text-primary">
-                <Link href={item.href}>{item.label}</Link>
-              </Button>
+        {/* Desktop Category Navigation + Search (Full width) */}
+  <div className="hidden md:flex h-12 items-center w-full px-0 justify-between">
+          <div className="flex flex-1 items-center gap-12 w-0 min-w-0 overflow-x-auto justify-end pr-10">
+            {mainNavItems.map((item) => (
+              <div key={item.id} onMouseEnter={() => handleMouseEnter(item.id)}>
+                <Button variant="ghost" asChild className="font-semibold text-base text-foreground hover:text-primary px-2 py-1 whitespace-nowrap">
+                  <Link href={item.href}>{item.label}</Link>
+                </Button>
+              </div>
+            ))}
+          </div>
+          <div className="flex-shrink-0 w-[480px] max-w-[40vw] ml-8 mr-8">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="2,000여개의 커스텀 상품을 쉽게 찾아 보세요."
+                className="w-full rounded-full border-2 border-primary bg-background py-2 pl-12 pr-4 text-base"
+              />
             </div>
-          ))}
+          </div>
         </div>
       </div>
        {subNavToShow && (
