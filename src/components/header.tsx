@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { Search, ShoppingCart, Menu } from 'lucide-react';
@@ -21,6 +23,8 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const { cartCount } = useCartContext();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   const handleCategoryHover = (cat: string) => {
     setActiveCategory(cat);
@@ -41,36 +45,41 @@ export function Header() {
   const subNavToShow = mainNavItems.find(item => item.id === activeSubNav)?.subnav;
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  const handleOrderClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      router.push('/login');
+    } else {
+      router.push('/mypage/orders');
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full flex-col border-b bg-background shadow-sm" onMouseLeave={handleCategoryLeave}>
+    <header className="sticky top-0 z-50 w-full flex-col border-b bg-background shadow-sm">
       <TopStripBanner />
 
       {/* 상단 유틸 바 */}
-      <div className="border-b hidden md:block">
-        <div className="container mx-auto flex h-10 items-center justify-between px-4 text-xs">
-          <div className="flex-1" />
-          <div className="flex flex-1 items-center justify-center gap-4 text-muted-foreground">
-            <Link href="/support/notice" className="hover:underline">공지사항</Link>
-            <Link href="/support/faq" className="hover:underline">고객센터</Link>
-            <Link href="/support/guide" className="hover:underline">이용가이드</Link>
-            <Link href="/events" className="hover:underline">이벤트</Link>
-            <Link href="/mypage/inquiries" className="hover:underline">문의게시판</Link>
-            <Link href="/resources" className="hover:underline">자료실</Link>
-          </div>
-          <div className="flex flex-1 items-center justify-end gap-4 text-muted-foreground">
-            <HeaderAuthNav />
-            <div className="h-4 w-px bg-gray-200" />
-            <Link href="/cart" className="flex items-center gap-1 hover:text-primary">
-              <ShoppingCart className="h-4 w-4" />
-              <span>장바구니 ({cartCount})</span>
-            </Link>
+
+  <div className="border-b hidden md:block">
+  </div>
+        <div className="w-full mx-auto flex h-10 items-center px-4 text-xs">
+          <div className="flex flex-1 items-center justify-end gap-4">
+            <Link href="/register" className="hover:text-primary text-sm">회원가입</Link>
+            <Link href="/login" className="hover:text-primary text-sm">로그인</Link>
+            <a href="/mypage/orders" className="hover:text-primary text-sm" onClick={handleOrderClick}>주문조회</a>
           </div>
         </div>
-      </div>
+
+
 
       {/* 메인 헤더 */}
       <div className="w-full">
-        <div className="flex h-20 items-center justify-between w-full px-0">
+        {/* 카테고리 네비 + 서브네비 전체 래퍼 */}
+        <div
+          className="relative"
+          onMouseLeave={handleCategoryLeave}
+        >
+          <div className="flex h-20 items-center justify-between w-full px-0">
           <Link href="/" className="flex items-center gap-2 text-3xl font-bold ml-8">
             <Image src={require('./img/logo.png')} width={150} height={30} alt="logo" className="object-contain" />
           </Link>
@@ -99,7 +108,7 @@ export function Header() {
             <Button variant="ghost" size="icon" asChild>
               <Link href="/cart">
                 <ShoppingCart className="h-6 w-6" />
-                <span className="sr-only">장바구니</span>
+                <span className="sr-only">주문조회</span>
               </Link>
             </Button>
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -154,8 +163,8 @@ export function Header() {
           </div>
         </div>
 
-        {/* 카테고리 네비 + 검색 */}
-        <div className="hidden md:flex h-14 items-center w-full justify-between">
+  {/* 카테고리 네비 + 검색 */}
+  <div className="hidden md:flex h-14 items-center w-full justify-between">
           <ul className="flex items-center gap-12 ml-16 list-none">
             {[
               { id: 'all', label: 'ALL' },
@@ -202,18 +211,79 @@ export function Header() {
       {/* 서브 네비 */}
       {subNavToShow && (
         activeSubNav === 'all' ? (
-          <div className="hidden md:block border-t bg-background shadow-md w-screen left-0 fixed z-40" style={{ top: '218px' }}>
+          <div
+            className="hidden md:block border-t bg-background shadow-md w-screen left-0 fixed z-40"
+            style={{ top: '218px' }}
+            onMouseEnter={() => setActiveSubNav('all')}
+            onMouseLeave={handleCategoryLeave}
+          >
             <div className="w-full px-8 py-8">
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-6 w-full">
-                {subNavToShow.map((subItem) => (
-                  <Button key={subItem.label} variant="ghost" size="sm" asChild className="font-medium text-muted-foreground hover:text-primary justify-start text-left whitespace-nowrap">
-                    <Link href={subItem.href}>{subItem.label}</Link>
-                  </Button>
-                ))}
+              <div className="grid grid-cols-6 gap-6 w-full text-[15px]">
+                {/* ALL (왼쪽) */}
+                <div>
+                  <div className="font-semibold mb-2">ALL</div>
+                  <div className="flex flex-col gap-1">
+                    <Link href="#" className="hover:text-primary">커스텀상품(제품뷰)</Link>
+                    <Link href="#" className="hover:text-primary">단체판촉상품(제품뷰)</Link>
+                    <Link href="#" className="hover:text-primary">IP굿즈 상품개발(페이지)</Link>
+                    <Link href="#" className="hover:text-primary">브랜드의뢰(페이지)</Link>
+                    <Link href="#" className="hover:text-primary">리뷰(게시판)</Link>
+                    <Link href="#" className="hover:text-primary">상품주문 가이드(페이지)</Link>
+                  </div>
+                </div>
+                {/* 팬굿즈 */}
+                <div>
+                  <div className="font-semibold mb-2">팬굿즈</div>
+                  <div className="flex flex-col gap-1">
+                    <Link href="#" className="hover:text-primary">아크릴 굿즈</Link>
+                    <Link href="#" className="hover:text-primary">지류 굿즈</Link>
+                    <Link href="#" className="hover:text-primary">스티커(다꾸)</Link>
+                    <Link href="#" className="hover:text-primary">핀거믹/버튼</Link>
+                    <Link href="#" className="hover:text-primary">등신대</Link>
+                    <Link href="#" className="hover:text-primary">ETC</Link>
+                  </div>
+                </div>
+                {/* 단체 판촉상품 */}
+                <div>
+                  <div className="font-semibold mb-2">단체 판촉상품</div>
+                  <div className="flex flex-col gap-1">
+                    <Link href="#" className="hover:text-primary">머그컵/유리컵</Link>
+                    <Link href="#" className="hover:text-primary">텀블러</Link>
+                    <Link href="#" className="hover:text-primary">수건</Link>
+                    <Link href="#" className="hover:text-primary">시계</Link>
+                    <Link href="#" className="hover:text-primary">우산</Link>
+                    <Link href="#" className="hover:text-primary">티셔츠</Link>
+                  </div>
+                </div>
+                {/* 광고물/사인 */}
+                <div>
+                  <div className="font-semibold mb-2">광고물/사인</div>
+                  <div className="flex flex-col gap-1">
+                    <Link href="#" className="hover:text-primary">LED 네온</Link>
+                    <Link href="#" className="hover:text-primary">환경디자인</Link>
+                    <Link href="#" className="hover:text-primary">미니간판</Link>
+                  </div>
+                </div>
+                {/* 반려동물 */}
+                <div>
+                  <div className="font-semibold mb-2">반려동물</div>
+                  <div className="flex flex-col gap-1">
+                    <Link href="#" className="hover:text-primary">액자/소품/네임택</Link>
+                    <Link href="#" className="hover:text-primary">쿠션/방석/패브릭 제품</Link>
+                    <Link href="#" className="hover:text-primary">장례용품</Link>
+                  </div>
+                </div>
+                {/* 포장 부자재 */}
+                <div>
+                  <div className="font-semibold mb-2">포장 부자재</div>
+                  <div className="flex flex-col gap-1">
+                    <Link href="#" className="hover:text-primary">전체보기</Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        ) : (
+  ) : (
           <div className="hidden md:block border-t bg-background shadow-md">
             <div className="container mx-auto px-4">
               <div className="flex h-12 items-center justify-center gap-x-6 gap-y-2 text-sm">
@@ -227,6 +297,7 @@ export function Header() {
           </div>
         )
       )}
-    </header>
+    </div>
+  </header>
   );
 }

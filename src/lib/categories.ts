@@ -36,7 +36,7 @@ const woodSubNav: SubCategory[] = [
 ];
 
 const packagingSubNav: SubCategory[] = [
-  { href: '/category/packaging?sub=swatch', label: '스와치', id: 'swatch' },
+  { href: '/categ ory/packaging?sub=swatch', label: '스와치', id: 'swatch' },
   { href: '/category/packaging?sub=supplies', label: '부자재', id: 'supplies' },
   { href: '/category/packaging?sub=packaging', label: '포장재', id: 'packaging' },
 ];
