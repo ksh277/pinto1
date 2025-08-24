@@ -14,14 +14,14 @@ const heroBanners = [
     id: '1',
     href: '#',
     alt: 'Hand holding a wooden whale craft.',
-    imgSrc: 'https://placehold.co/1600x1000.png',
+    imgSrc: 'https://placehold.co/2000x1250.png',
     hint: 'wooden whale craft',
   },
   {
     id: '2',
     href: '#',
     alt: 'Custom wooden coasters with map engravings.',
-    imgSrc: 'https://placehold.co/1600x1000.png',
+    imgSrc: 'https://placehold.co/2000x1250.png',
     hint: 'custom wooden coasters',
   },
 ];
@@ -98,7 +98,7 @@ export default function Home() {
             <Link
               key={banner.id}
               href={banner.href}
-              className="group relative block h-96 w-full overflow-hidden md:h-[650px]"
+              className="group relative block h-[500px] w-full overflow-hidden md:h-[800px]"
             >
               <Image
                 src={banner.imgSrc}
@@ -114,12 +114,12 @@ export default function Home() {
       </section>
 
       {/* SHORTCUTS */}
-      <section className="container mx-auto px-4 py-12 md:py-16">
+      <section className="w-full px-4 py-12 md:py-16">
         <CategoryShortcuts categories={shortcutCategories} />
       </section>
 
       {/* INFO CARDS — 작은 캡션 + 회색 박스 (글자 더 아래 / 박스 더 큼) */}
-      <section className="container mx-auto px-4 pt-12 md:pt-14">
+      <section className="w-full px-4 pt-12 md:pt-14">
         <p className="mb-4 text-[13px] leading-5 text-slate-500">
           온, 오프라인 어디에서나 쉽고 빠르게 만들 수 있어요!
         </p>
@@ -142,7 +142,7 @@ export default function Home() {
       </section>
 
       {/* PRODUCT SHELF — 3열(상단 회색 배너 + 하단 미니 리스트) */}
-      <section className="container mx-auto px-4 py-10 md:py-14">
+      <section className="w-full px-4 py-10 md:py-14">
         <h2 className="mb-4 text-[15px] font-semibold text-slate-700">
           단체 굿즈 합리적인 가격으로 예쁘게 만들어 드릴게요.
         </h2>
@@ -198,8 +198,8 @@ export default function Home() {
       </section>
 
       {/* 창작자 CTA (가운데 큰 텍스트/버튼) */}
-      <section className="bg-white dark:bg-card">
-        <div className="container mx-auto px-4 py-12 text-center md:py-16">
+      <section className="bg-white dark:bg-card w-full">
+        <div className="w-full px-4 py-12 text-center md:py-16">
           <h2 className="text-xl font-bold md:text-2xl">
             창작자, 작가 모두가 참여하는 플랫폼 PINTO
           </h2>
@@ -215,7 +215,7 @@ export default function Home() {
       </section>
 
       {/* ✅ 주간 랭킹 4카드 — CTA 아래로 이동 */}
-      <section className="container mx-auto px-4 pt-6 pb-10 md:pt-8 md:pb-14">
+      <section className="w-full px-4 pt-6 pb-10 md:pt-8 md:pb-14">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-[15px] font-semibold text-slate-700">
             창작자, 작가 참여 마켓 주간 랭킹보기
@@ -258,8 +258,8 @@ export default function Home() {
       </section>
 
       {/* 하단 3 CTA 카드 */}
-      <section className="bg-white dark:bg-card">
-        <div className="container mx-auto px-4 pb-14 pt-6 md:pb-20 md:pt-10">
+      <section className="bg-white dark:bg-card w-full">
+        <div className="w-full px-4 pb-14 pt-6 md:pb-20 md:pt-10">
           <h3 className="mb-4 text-[13px] font-medium text-slate-600">
             함께 성장해요. 고객별 혜택 확인하기
           </h3>
