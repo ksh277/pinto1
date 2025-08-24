@@ -3,13 +3,21 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { X } from 'lucide-react';
-import { Banner, isHidden, setHideUntil } from '@/lib/banner';
+import { usePathname } from 'next/navigation';
+import {
+  Banner,
+  isHidden,
+  setHideUntil,
+  setSessionClosed,
+} from '@/lib/banner';
 import '@/styles/banner.css';
 
 export function TopStripBanner() {
   const [banner, setBanner] = useState<Banner | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hideToday, setHideToday] = useState(false);
   const [hideWeek, setHideWeek] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     let mounted = true;
@@ -23,6 +31,11 @@ export function TopStripBanner() {
         if (!data.isOpen) return;
         if (!isHidden(data.id) && mounted) {
           setBanner(data);
+          console.log('banner_impression', {
+            id: data.id,
+            route: pathname,
+            timestamp: new Date().toISOString(),
+          });
         }
       } catch (err) {
         console.warn('TopStripBanner: failed to load banner', err);
@@ -43,8 +56,38 @@ export function TopStripBanner() {
 
   const handleClose = () => {
     if (!banner) return;
-    const duration = hideWeek ? 7 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000;
-    setHideUntil(banner.id, duration);
+
+    if (hideWeek) {
+      const until = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      setHideUntil(banner.id, until);
+      console.log('banner_close', {
+        id: banner.id,
+        choice: 'week',
+      });
+    } else if (hideToday) {
+      const now = new Date();
+      const until = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        23,
+        59,
+        59,
+        999,
+      );
+      setHideUntil(banner.id, until);
+      console.log('banner_close', {
+        id: banner.id,
+        choice: 'today',
+      });
+    } else {
+      setSessionClosed(banner.id);
+      console.log('banner_close', {
+        id: banner.id,
+        choice: 'session',
+      });
+    }
+
     setBanner(null);
   };
 
@@ -83,7 +126,7 @@ export function TopStripBanner() {
       className={`w-full shadow-sm ring-1 ring-white/40 ${getTextColor()}`}
       style={style}
     >
-      <div className="flex w-full h-11 md:h-12 items-center justify-center px-0 text-xs md:text-sm relative">
+      <div className="flex w-full min-h-[40px] md:min-h-[56px] max-h-[64px] md:max-h-[80px] items-center justify-center px-0 text-xs md:text-sm relative py-2 md:py-3">
         {/* 중앙 메시지 */}
         <div className="w-full flex items-center justify-center absolute left-0 top-0 h-full pointer-events-none">
           <span className="font-semibold text-center w-full block pointer-events-auto">
@@ -96,21 +139,39 @@ export function TopStripBanner() {
             )}
           </span>
         </div>
-        {/* 오른쪽: 일주일간 보지 않기 & 닫기 */}
+        {/* 오른쪽: 체크박스 & 닫기 */}
         {banner.canClose && (
           <div className="flex items-center gap-2 whitespace-nowrap absolute right-4 md:right-5 top-1/2 -translate-y-1/2 bg-transparent z-10">
             <input
-              id="hide7d"
+              id="hideToday"
+              type="checkbox"
+              className="h-4 w-4"
+              checked={hideToday}
+              onChange={e => {
+                const checked = e.target.checked;
+                setHideToday(checked);
+                if (checked) setHideWeek(false);
+              }}
+            />
+            <label htmlFor="hideToday" className="cursor-pointer select-none text-xs">
+              오늘하루 보지 않기
+            </label>
+            <input
+              id="hideWeek"
               type="checkbox"
               className="h-4 w-4"
               checked={hideWeek}
-              onChange={e => setHideWeek(e.target.checked)}
+              onChange={e => {
+                const checked = e.target.checked;
+                setHideWeek(checked);
+                if (checked) setHideToday(false);
+              }}
             />
-            <label htmlFor="hide7d" className="cursor-pointer select-none text-xs">
-              일주일간 보지 않기
+            <label htmlFor="hideWeek" className="cursor-pointer select-none text-xs">
+              일주일 간 보지 않기
             </label>
             <button
-              aria-label="배너 닫기"
+              aria-label="띠배너 닫기"
               onClick={handleClose}
               className="p-1 hover:opacity-80"
             >

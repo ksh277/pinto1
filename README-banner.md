@@ -5,7 +5,7 @@ This module provides a dismissible banner shown at the top of the home page.
 ## Behavior
 - Fetches the active banner from `/api/banners/active` with `no-store` caching.
 - Shows a skeleton for at least 300 ms while loading.
-- Users can hide the banner for a day or a week using localStorage with key `pinto_banner_hide_until__{id}`.
+- Users can hide the banner for today or for a week via mutually exclusive checkboxes. The hide timestamp is stored in `localStorage` under `banner:<id>:hideUntil` (ISO string). Closing without selecting a duration hides it only for the current session using `sessionStorage` key `banner:<id>:closed`.
 - Supports color, gradient or image backgrounds.
 - Accessible via keyboard with roles and labels.
 
