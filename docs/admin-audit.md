@@ -75,3 +75,12 @@ src/app/admin/inquiries/page.tsx
 ## Notes
 
 The current Prisma schema only defines a `Design` model. No admin-specific tables (banners, categories, products, etc.) are present.
+
+## PR0 Setup Checklist
+
+- [x] Testing stack: vitest, @testing-library/react, @testing-library/jest-dom, jsdom
+- [x] Storybook 8 with a11y addon
+- [x] React Hot Toast provider at app root
+- [x] Basic i18n structure (`src/i18n/ko.json` and `useI18n` hook)
+- [x] Sample test and story in place
+- [x] Scripts: `test`, `test:watch`, `storybook`, `storybook:build`
