@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { TopBanner, type HeroBanner } from '@/components/TopBanner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CategoryShortcuts } from '@/components/category-shortcuts';
@@ -9,20 +10,18 @@ import { useProductContext } from '@/contexts/product-context';
 import type { Product } from '@/lib/types';
 import { ChevronRight } from 'lucide-react';
 
-const heroBanners = [
+const heroBanners: HeroBanner[] = [
   {
     id: '1',
     href: '#',
     alt: 'Hand holding a wooden whale craft.',
     imgSrc: 'https://placehold.co/1600x1200.png',
-    hint: 'wooden whale craft',
   },
   {
     id: '2',
     href: '#',
     alt: 'Custom wooden coasters with map engravings.',
     imgSrc: 'https://placehold.co/1600x1200.png',
-    hint: 'custom wooden coasters',
   },
 ];
 
@@ -92,25 +91,8 @@ export default function Home() {
   return (
   <div className="flex flex-col bg-slate-50 dark:bg-slate-900 min-h-screen px-8 md:px-16">
       {/* HERO */}
-  <section className="pt-8">
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          {heroBanners.map(banner => (
-            <Link
-              key={banner.id}
-              href={banner.href}
-              className="group relative block h-[500px] w-full overflow-hidden md:h-[800px]"
-            >
-              <Image
-                src={banner.imgSrc}
-                alt={banner.alt}
-                fill
-                priority
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </Link>
-          ))}
-        </div>
+      <section className="pt-8">
+        <TopBanner banners={heroBanners} />
       </section>
 
       {/* SHORTCUTS */}
