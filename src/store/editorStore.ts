@@ -1,7 +1,7 @@
 'use client'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import produce from 'immer'
+import { produce } from 'immer'
 import type { EditorNode, EditorState, ImageNode, TextNode, ShapeNode, ShapeKind, TemplatePlate } from '@/types/editor'
 
 const DPI = 300
