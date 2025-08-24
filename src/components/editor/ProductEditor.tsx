@@ -1,19 +1,10 @@
 'use client'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef } from 'react'
-import dynamic from 'next/dynamic'
+import { Stage, Layer, Line, Circle, Image as KImage, Text as KText, Transformer } from 'react-konva'
 import useImage from 'use-image'
 import { useEditorStore } from '@/store/editorStore'
 import type { ImageNode, TextNode } from '@/types/editor'
-
-// Konva는 브라우저에서만
-const Stage       = dynamic(() => import('react-konva').then(m => m.Stage),       { ssr: false })
-const Layer       = dynamic(() => import('react-konva').then(m => m.Layer),       { ssr: false })
-const Line        = dynamic(() => import('react-konva').then(m => m.Line),        { ssr: false })
-const Circle      = dynamic(() => import('react-konva').then(m => m.Circle),      { ssr: false })
-const KImage      = dynamic(() => import('react-konva').then(m => m.Image),       { ssr: false })
-const KText       = dynamic(() => import('react-konva').then(m => m.Text),        { ssr: false })
-const Transformer = dynamic(() => import('react-konva').then(m => m.Transformer), { ssr: false })
 
 export function ProductEditor() {
   const { state, select, setHole } = useEditorStore() as any
