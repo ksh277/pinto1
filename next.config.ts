@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
     config.resolve.alias['genkit'] = false;
     config.resolve.alias['dotprompt'] = false;
     config.resolve.alias['handlebars'] = false;
+    // 서버 빌드에서 konva가 node-canvas를 요구하지 않도록
     config.resolve.alias['canvas'] = false;
     return config;
   },

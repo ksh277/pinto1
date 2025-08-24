@@ -1,98 +1,162 @@
 'use client'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect } from 'react'
-import dynamic from 'next/dynamic'
-const ProductEditor = dynamic(() => import('./ProductEditor').then(m => m.ProductEditor), { ssr: false })
-import { SizeSelector } from './SizeSelector'
-import { ProductTypeSelector } from './ProductTypeSelector'
+import Link from 'next/link'
 import { useEditorStore } from '@/store/editorStore'
-import type { TemplatePlate } from '@/types/editor'
+import { ProductEditor } from './ProductEditor'
 
-const DPI = 300
-const mmToPx = (mm: number, dpi = DPI) => (mm / 25.4) * dpi
+export function EditorLayout({ initialProduct: _initialProduct }: { initialProduct?: string }) {
+  const { undo, redo, removeSelected, setPanning } = useEditorStore() as any
 
-const PRESETS: Record<string, { template: TemplatePlate; width: number; height: number; hole?: { x: number; y: number; diameterMM?: number } }> = {
-  keyring: { template: 'rect', width: 70, height: 70, hole: { x: 35, y: 6, diameterMM: 4 } },
-  stand: { template: 'rect', width: 100, height: 150 },
-  coaster: { template: 'circle', width: 90, height: 90 },
-  pouch: { template: 'rect', width: 80, height: 120 },
-  smarttok: { template: 'circle', width: 60, height: 60 },
-  badge: { template: 'circle', width: 50, height: 50 },
-  stationery: { template: 'rect', width: 150, height: 50 },
-  carabiner: { template: 'rect', width: 60, height: 80 },
-}
-
-export function EditorLayout({ initialProduct }: { initialProduct?: string }) {
-  const { setTemplate, setSizeMM, setHole } = useEditorStore()
-
+  // Esc로 이동툴 해제
   useEffect(() => {
-    if (!initialProduct) return
-    const preset = PRESETS[initialProduct]
-    if (!preset) return
-    setTemplate(preset.template)
-    setSizeMM(preset.width, preset.height)
-    if (preset.hole) {
-      const { x, y, diameterMM } = preset.hole
-      setHole(mmToPx(x), mmToPx(y), diameterMM)
-    }
-  }, [initialProduct, setTemplate, setSizeMM, setHole])
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setPanning(false) }
+    window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
+  }, [setPanning])
 
   return (
-    <div className="p-4">
-      <div className="max-w-[1280px] mx-auto grid grid-cols-[300px_1fr_300px] gap-4">
-        <ProductTypeSelector />
-        <div className="flex items-start justify-center">
+    <div className="flex h-[calc(100vh)] flex-col bg-[#efefef]">
+      {/* 상단 바 */}
+      <header className="flex h-14 items-center justify-between bg-white px-4 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="font-semibold">ALL THAT PRINTING <span className="text-xs font-normal">EDITOR</span></div>
+          <div className="text-sm text-gray-500">|</div>
+          <select className="rounded-md border px-2 py-1 text-sm">
+            <option>키링</option>
+            <option>스탠드</option>
+            <option>스마트톡</option>
+          </select>
+        </div>
+        <div className="flex items-center gap-6 text-sm">
+          <ToolbarButton onClick={undo}>이전</ToolbarButton>
+          <ToolbarButton onClick={redo}>이후</ToolbarButton>
+          <ToolbarButton onClick={() => setPanning(true)}>이동</ToolbarButton>
+          <ToolbarButton onClick={removeSelected}>삭제</ToolbarButton>
+        </div>
+        <div className="flex items-center gap-2">
+          <ToolbarGhostButton onClick={()=>document.getElementById('file-input')?.click()}>불러오기</ToolbarGhostButton>
+          <ToolbarGhostButton onClick={()=>document.getElementById('btn-save')?.dispatchEvent(new Event('click',{bubbles:true}))}>저장</ToolbarGhostButton>
+          <ToolbarPrimaryButton onClick={()=>document.getElementById('btn-pdf')?.dispatchEvent(new Event('click',{bubbles:true}))}>PDF 다운로드</ToolbarPrimaryButton>
+          <Link href="/" className="rounded-md border px-3 py-2 text-sm">✕ 창닫기</Link>
+        </div>
+      </header>
+
+      {/* 본문 */}
+      <div className="grid flex-1 grid-cols-[280px_1fr] gap-0">
+        <LeftRail />
+        <div className="relative">
           <ProductEditor />
-        </div>
-        <div className="space-y-4">
-          <SizeSelector />
-          <ExportPanel />
+          <BottomBar />
         </div>
       </div>
     </div>
   )
 }
 
-function ExportPanel() {
-  const onPng = () => {
-    const cvs = document.querySelector('canvas') as HTMLCanvasElement
-    const url = cvs.toDataURL('image/png')
-    download(url, 'design.png')
-  }
-  const onSvg = () => {
-    const cvs = document.querySelector('canvas') as HTMLCanvasElement
-    const url = cvs.toDataURL('image/png')
-    const svg = `<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" width="${cvs.width}" height="${cvs.height}" viewBox="0 0 ${cvs.width} ${cvs.height}"><image href="${url}" x="0" y="0" width="${cvs.width}" height="${cvs.height}"/></svg>`
-    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })
-    download(URL.createObjectURL(blob), 'design.svg')
-  }
-  const onPdf = async () => {
-    const { default: jsPDF } = await import('jspdf')
-    const cvs = document.querySelector('canvas') as HTMLCanvasElement
-    const url = cvs.toDataURL('image/png')
-    const pdf = new jsPDF({ unit: 'mm', format: [210, 297] }) // A4 예시
-    pdf.addImage(url, 'PNG', 10, 10, 190, (190 * cvs.height) / cvs.width)
-    pdf.save('design.pdf')
-  }
-  const onSave = async () => {
-    const cvs = document.querySelector('canvas') as HTMLCanvasElement
-    const previewDataUrl = cvs.toDataURL('image/png')
-    const payload = (window as any).__EDITOR_PAYLOAD__
-    const res = await fetch('/api/designs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...payload, previewDataUrl }) })
-    const json = await res.json()
-    if (!json.ok) return alert('저장 실패: ' + json.error)
-    alert('DB 저장 완료: ' + json.id)
-  }
+function ToolbarButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return <button {...props} className="text-sm text-gray-600 hover:text-black" />
+}
+function ToolbarGhostButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return <button {...props} className="rounded-md border px-3 py-2 text-sm" />
+}
+function ToolbarPrimaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return <button {...props} className="rounded-md bg-black px-3 py-2 text-sm text-white" />
+}
+
+/** 좌측 레일 */
+function LeftRail() {
+  const { state, setMode, setTemplate, setSizeMM, lockSize, addImageFromSrc, addText } = useEditorStore() as any
+  const [w, setW] = React.useState(state.size.widthMM)
+  const [h, setH] = React.useState(state.size.heightMM)
+  const fileRef = React.useRef<HTMLInputElement>(null)
+
   return (
-    <div className="p-3 border rounded-2xl bg-white space-y-2">
-      <h3 className="font-semibold">내보내기/저장</h3>
-      <div className="grid grid-cols-3 gap-2">
-        <button className="rounded-xl border px-2 py-1" onClick={onPng}>PNG</button>
-        <button className="rounded-xl border px-2 py-1" onClick={onSvg}>SVG</button>
-        <button className="rounded-xl border px-2 py-1" onClick={onPdf}>PDF</button>
+    <aside className="flex h-full flex-col bg-[#2b2b2b] text-white">
+      {/* 탭 */}
+      <div className="grid h-12 grid-cols-2">
+        <button className={`text-sm ${state.mode==='auto'?'bg-[#1f1f1f]':''}`} onClick={()=>setMode('auto')}>자율형</button>
+        <button className={`text-sm ${state.mode==='template'?'bg-[#1f1f1f]':''}`} onClick={()=>setMode('template')}>템플릿핑</button>
       </div>
-      <button className="w-full rounded-xl border px-3 py-2" onClick={onSave}>DB 저장</button>
+
+      {/* 섹션 */}
+      <div className="flex-1 space-y-6 overflow-y-auto p-4 text-sm">
+        <div>
+          <div className="mb-2 text-gray-300">사이즈 (mm)</div>
+          <div className="flex gap-2">
+            <input type="number" className="w-20 rounded bg-[#1f1f1f] px-2 py-1" value={w} onChange={e=>setW(parseFloat(e.target.value||'0'))} />
+            <input type="number" className="w-20 rounded bg-[#1f1f1f] px-2 py-1" value={h} onChange={e=>setH(parseFloat(e.target.value||'0'))} />
+            <button className="rounded bg-white px-3 py-1 text-black" onClick={()=>{ setSizeMM(w,h); lockSize(true) }}>적용</button>
+          </div>
+          {!state.ui.sizeLocked && <div className="mt-3 text-xs text-gray-400">사이즈 선택 후 이용 가능합니다.</div>}
+        </div>
+
+        <div>
+          <div className="mb-2 text-gray-300">이미지</div>
+          <input id="file-input" ref={fileRef} type="file" accept="image/*" hidden
+                 onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>addImageFromSrc(r.result as string); r.readAsDataURL(f) }}}/>
+          <button className="w-full rounded bg-white px-3 py-2 text-black" onClick={()=>fileRef.current?.click()} disabled={!state.ui.sizeLocked}>이미지 불러오기</button>
+        </div>
+
+        <div>
+          <div className="mb-2 text-gray-300">텍스트</div>
+          <button className="w-full rounded border border-white/30 px-3 py-2" onClick={()=>addText('텍스트')} disabled={!state.ui.sizeLocked}>텍스트 추가</button>
+        </div>
+
+        {state.mode==='template' && (
+          <div>
+            <div className="mb-2 text-gray-300">판 모양</div>
+            <div className="grid grid-cols-4 gap-2">
+              {(['rect','circle','pentagon','hexagon'] as const).map(t=> (
+                <button key={t} className={`rounded px-2 py-1 ${state.templatePlate===t?'bg-white text-black':'bg-[#1f1f1f]'}`} onClick={()=>setTemplate(t)}>{t}</button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </aside>
+  )
+}
+
+/** 하단 바 */
+function BottomBar() {
+  const { state, setRingCount, setRingSize, toggleRingBack, toggleRingFront, setWhiteWrap, zoomOut, zoomIn } = useEditorStore() as any
+  return (
+    <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-10 border-t bg-white/95 px-4 py-2">
+      <div className="flex items-center gap-3 text-sm">
+        <label className="flex items-center gap-2">고리개수
+          <button className="rounded border px-2" onClick={()=>setRingCount(state.ui.ringCount-1)}>-</button>
+          <span className="w-6 text-center">{state.ui.ringCount}</span>
+          <button className="rounded border px-2" onClick={()=>setRingCount(state.ui.ringCount+1)}>+</button>
+        </label>
+
+        <div className="flex items-center gap-2">
+          고리방향
+          <label className="flex items-center gap-1"><input type="checkbox" checked={state.ui.ringBack} onChange={toggleRingBack}/> 바깥쪽</label>
+          <label className="flex items-center gap-1"><input type="checkbox" checked={state.ui.ringFront} onChange={toggleRingFront}/> 안쪽</label>
+        </div>
+
+        <div className="flex items-center gap-2">
+          고리크기
+          {[2,2.5,3,4].map(mm=> (
+            <button key={mm} className={`rounded border px-2 ${state.ui.ringSizeMM===mm?'bg-black text-white':''}`} onClick={()=>setRingSize(mm)}>{mm}mm</button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          화이트둘러싸기
+          <button className="rounded border px-2" onClick={()=>setWhiteWrap(state.ui.whiteWrap-1)}>-</button>
+          <span className="w-6 text-center">{state.ui.whiteWrap}</span>
+          <button className="rounded border px-2" onClick={()=>setWhiteWrap(state.ui.whiteWrap+1)}>+</button>
+        </div>
+
+        <div className="ml-auto flex items-center gap-2">
+          <button className="rounded border px-2" onClick={zoomOut}>-</button>
+          <span className="w-14 text-center">{Math.round(state.ui.zoom*100)}%</span>
+          <button className="rounded border px-2" onClick={zoomIn}>+</button>
+          <button id="btn-pdf" className="hidden" />
+          <button id="btn-save" className="hidden" />
+        </div>
+      </div>
     </div>
   )
 }
-function download(url: string, name: string) { const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove() }
