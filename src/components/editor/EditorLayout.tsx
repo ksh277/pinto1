@@ -1,12 +1,42 @@
 'use client'
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react'
+import React, { useEffect } from 'react'
 import dynamic from 'next/dynamic'
 const ProductEditor = dynamic(() => import('./ProductEditor').then(m => m.ProductEditor), { ssr: false })
 import { SizeSelector } from './SizeSelector'
 import { ProductTypeSelector } from './ProductTypeSelector'
+import { useEditorStore } from '@/store/editorStore'
+import type { TemplatePlate } from '@/types/editor'
 
-export function EditorLayout() {
+const DPI = 300
+const mmToPx = (mm: number, dpi = DPI) => (mm / 25.4) * dpi
+
+const PRESETS: Record<string, { template: TemplatePlate; width: number; height: number; hole?: { x: number; y: number; diameterMM?: number } }> = {
+  keyring: { template: 'rect', width: 70, height: 70, hole: { x: 35, y: 6, diameterMM: 4 } },
+  stand: { template: 'rect', width: 100, height: 150 },
+  coaster: { template: 'circle', width: 90, height: 90 },
+  pouch: { template: 'rect', width: 80, height: 120 },
+  smarttok: { template: 'circle', width: 60, height: 60 },
+  badge: { template: 'circle', width: 50, height: 50 },
+  stationery: { template: 'rect', width: 150, height: 50 },
+  carabiner: { template: 'rect', width: 60, height: 80 },
+}
+
+export function EditorLayout({ initialProduct }: { initialProduct?: string }) {
+  const { setTemplate, setSizeMM, setHole } = useEditorStore()
+
+  useEffect(() => {
+    if (!initialProduct) return
+    const preset = PRESETS[initialProduct]
+    if (!preset) return
+    setTemplate(preset.template)
+    setSizeMM(preset.width, preset.height)
+    if (preset.hole) {
+      const { x, y, diameterMM } = preset.hole
+      setHole(mmToPx(x), mmToPx(y), diameterMM)
+    }
+  }, [initialProduct, setTemplate, setSizeMM, setHole])
+
   return (
     <div className="p-4">
       <div className="max-w-[1280px] mx-auto grid grid-cols-[300px_1fr_300px] gap-4">

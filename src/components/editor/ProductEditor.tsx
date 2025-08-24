@@ -1,5 +1,5 @@
 'use client';
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, no-unused-vars */
 import React, { useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import useImage from 'use-image';
@@ -11,34 +11,15 @@ import {
   nearestOnPolyline,
 } from '@/lib/editor/trace';
 import type { ImageNode, TextNode } from '@/types/editor';
-
-const Stage = dynamic<any>(
-  () => import('react-konva').then((mod) => mod.Stage),
-  { ssr: false },
-);
-const Layer = dynamic<any>(
-  () => import('react-konva').then((mod) => mod.Layer),
-  { ssr: false },
-);
-const Line = dynamic<any>(() => import('react-konva').then((mod) => mod.Line), {
-  ssr: false,
-});
-const Circle = dynamic<any>(
-  () => import('react-konva').then((mod) => mod.Circle),
-  { ssr: false },
-);
-const KImage = dynamic<any>(
-  () => import('react-konva').then((mod) => mod.Image),
-  { ssr: false },
-);
-const KText = dynamic<any>(
-  () => import('react-konva').then((mod) => mod.Text),
-  { ssr: false },
-);
-const Transformer = dynamic<any>(
-  () => import('react-konva').then((mod) => mod.Transformer),
-  { ssr: false },
-);
+const Stage       = dynamic(() => import('react-konva').then(m => m.Stage),       { ssr: false });
+const Layer       = dynamic(() => import('react-konva').then(m => m.Layer),       { ssr: false });
+const Rect        = dynamic(() => import('react-konva').then(m => m.Rect),        { ssr: false });
+const Line        = dynamic(() => import('react-konva').then(m => m.Line),        { ssr: false });
+const Circle      = dynamic(() => import('react-konva').then(m => m.Circle),      { ssr: false });
+const KImage      = dynamic(() => import('react-konva').then(m => m.Image),       { ssr: false });
+const KText       = dynamic(() => import('react-konva').then(m => m.Text),        { ssr: false });
+const Group       = dynamic(() => import('react-konva').then(m => m.Group),       { ssr: false });
+const Transformer = dynamic(() => import('react-konva').then(m => m.Transformer), { ssr: false });
 
 const DPI = 300;
 const mmToPx = (mm: number) => (mm / 25.4) * DPI;
