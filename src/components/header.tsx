@@ -185,7 +185,6 @@ export function Header() {
                       : 'text-muted-foreground hover:text-primary'
                   )}
                   onMouseEnter={() => handleCategoryHover(item.id!)}
-                  onMouseLeave={handleCategoryLeave}
                   onClick={() => handleCategoryClick(item.id!)}
                 >
                   {item.label}
@@ -210,8 +209,7 @@ export function Header() {
       {subNavToShow && (
         activeSubNav === 'all' ? (
           <div
-            className="hidden md:block border-t bg-background shadow-md w-screen left-0 fixed z-40"
-            style={{ top: '218px' }}
+            className="hidden md:block border-t bg-background shadow-md absolute left-0 w-full z-40"
             onMouseEnter={() => setActiveSubNav('all')}
             onMouseLeave={handleCategoryLeave}
           >
