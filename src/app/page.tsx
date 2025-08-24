@@ -14,14 +14,14 @@ const heroBanners = [
     id: '1',
     href: '#',
     alt: 'Hand holding a wooden whale craft.',
-    imgSrc: 'https://placehold.co/1600x1000.png',
+    imgSrc: 'https://placehold.co/1600x1200.png',
     hint: 'wooden whale craft',
   },
   {
     id: '2',
     href: '#',
     alt: 'Custom wooden coasters with map engravings.',
-    imgSrc: 'https://placehold.co/1600x1000.png',
+    imgSrc: 'https://placehold.co/1600x1200.png',
     hint: 'custom wooden coasters',
   },
 ];
@@ -90,15 +90,15 @@ export default function Home() {
     .slice(0, 4);
 
   return (
-    <div className="flex flex-col bg-slate-50 dark:bg-slate-900">
+  <div className="flex flex-col bg-slate-50 dark:bg-slate-900 min-h-screen px-8 md:px-16">
       {/* HERO */}
-      <section className="w-full pt-8">
+  <section className="pt-8">
         <div className="grid grid-cols-1 md:grid-cols-2">
           {heroBanners.map(banner => (
             <Link
               key={banner.id}
               href={banner.href}
-              className="group relative block h-96 w-full overflow-hidden md:h-[650px]"
+              className="group relative block h-[500px] w-full overflow-hidden md:h-[800px]"
             >
               <Image
                 src={banner.imgSrc}
@@ -114,17 +114,17 @@ export default function Home() {
       </section>
 
       {/* SHORTCUTS */}
-      <section className="container mx-auto px-4 py-12 md:py-16">
+  <section className="py-12 md:py-16">
         <CategoryShortcuts categories={shortcutCategories} />
       </section>
 
       {/* INFO CARDS — 작은 캡션 + 회색 박스 (글자 더 아래 / 박스 더 큼) */}
-      <section className="container mx-auto px-4 pt-12 md:pt-14">
-        <p className="mb-4 text-[13px] leading-5 text-slate-500">
+  <section className="pt-12 md:pt-14">
+        <p className="mb-4 text-[13px] leading-5 text-slate-500 px-4">
           온, 오프라인 어디에서나 쉽고 빠르게 만들 수 있어요!
         </p>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 px-2 md:px-8">
           {infoCards.map(card => (
             <div
               key={card.id}
@@ -142,64 +142,67 @@ export default function Home() {
       </section>
 
       {/* PRODUCT SHELF — 3열(상단 회색 배너 + 하단 미니 리스트) */}
-      <section className="container mx-auto px-4 py-10 md:py-14">
+  <section className="py-10 md:py-14">
         <h2 className="mb-4 text-[15px] font-semibold text-slate-700">
           단체 굿즈 합리적인 가격으로 예쁘게 만들어 드릴게요.
         </h2>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {shelves.map(shelf => (
-            <div key={shelf.id}>
-              <div className="min-h-[240px] md:min-h-[260px] rounded-2xl bg-neutral-200/80 dark:bg-neutral-800/70 pt-12 md:pt-14 pb-7 px-6">
-                <h3 className="text-[15px] font-semibold leading-6 text-neutral-900 dark:text-neutral-100 break-keep">
-                  {shelf.headline}
-                </h3>
-                <p className="mt-4 text-[12px] leading-6 text-neutral-600 dark:text-neutral-300 break-keep">
-                  {shelf.sub}
-                </p>
+  <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    {shelves.map(shelf => (
+      <div key={shelf.id}>
+        {/* 이미지 박스 */}
+        <div className="min-h-[240px] md:min-h-[260px] rounded-2xl bg-neutral-200/80 dark:bg-neutral-800/70 pt-12 md:pt-14 pb-7 px-6 flex items-center justify-center">
+          {/* 여기에 대표 이미지를 넣으려면 아래처럼 사용하세요. 현재는 예시로 비워둡니다. */}
+          {/* <Image src={...} alt={...} ... /> */}
+        </div>
+        {/* 설명글 */}
+        <h3 className="mt-4 text-[15px] font-semibold leading-6 text-neutral-900 dark:text-neutral-100 break-keep">
+          {shelf.headline}
+        </h3>
+        <p className="mt-2 text-[12px] leading-6 text-neutral-600 dark:text-neutral-300 break-keep">
+          {shelf.sub}
+        </p>
+        {/* 상품 리스트 */}
+        <div className="mt-4 space-y-4">
+          {shelf.picks.map((p: Product) => (
+            <div key={p.id} className="flex items-center gap-3">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-neutral-200">
+                <Image
+                  src={p.imageUrl || 'https://placehold.co/300x300.png'}
+                  alt={p.nameKo || 'product'}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
               </div>
-
-              <div className="mt-4 space-y-4">
-                {shelf.picks.map((p: Product) => (
-                  <div key={p.id} className="flex items-center gap-3">
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-neutral-200">
-                      <Image
-                          src={p.imageUrl || 'https://placehold.co/300x300.png'}
-                          alt={p.nameKo || 'product'}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                        <p className="truncate text-[12px] text-slate-500">
-                          {p.nameKo || '상품명'}
-                        </p>
-                      <div className="mt-1 text-[13px] font-semibold text-teal-600">
-                        {fmtPrice(p.priceKrw)} <span className="text-teal-600/70">부터</span>
-                      </div>
-                        <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-400">
-                          <span>♡ {p.stats?.likeCount ?? 0}</span>
-                          <span>리뷰 {p.stats?.reviewCount ?? 0}</span>
-                        </div>
-                    </div>
-                  </div>
-                ))}
-
-                <div className="pt-1">
-                  <Button asChild variant="outline" className="h-8 w-full rounded-full border-slate-300 text-xs text-slate-600">
-                    <Link href={shelf.moreHref || '#'}>more</Link>
-                  </Button>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[12px] text-slate-500">
+                  {p.nameKo || '상품명'}
+                </p>
+                <div className="mt-1 text-[13px] font-semibold text-teal-600">
+                  {fmtPrice(p.priceKrw)} <span className="text-teal-600/70">부터</span>
+                </div>
+                <div className="mt-1 flex items-center gap-3 text-[11px] text-slate-400">
+                  <span>♡ {p.stats?.likeCount ?? 0}</span>
+                  <span>리뷰 {p.stats?.reviewCount ?? 0}</span>
                 </div>
               </div>
             </div>
           ))}
+          <div className="pt-1">
+            <Button asChild variant="outline" className="h-8 w-full rounded-full border-slate-300 text-xs text-slate-600">
+              <Link href={shelf.moreHref || '#'}>more</Link>
+            </Button>
+          </div>
         </div>
+      </div>
+    ))}
+  </div>
       </section>
 
       {/* 창작자 CTA (가운데 큰 텍스트/버튼) */}
       <section className="bg-white dark:bg-card">
-        <div className="container mx-auto px-4 py-12 text-center md:py-16">
+        <div className="px-4 py-12 text-center md:py-16">
           <h2 className="text-xl font-bold md:text-2xl">
             창작자, 작가 모두가 참여하는 플랫폼 PINTO
           </h2>
@@ -215,7 +218,7 @@ export default function Home() {
       </section>
 
       {/* ✅ 주간 랭킹 4카드 — CTA 아래로 이동 */}
-      <section className="container mx-auto px-4 pt-6 pb-10 md:pt-8 md:pb-14">
+  <section className="pt-6 pb-10 md:pt-8 md:pb-14">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-[15px] font-semibold text-slate-700">
             창작자, 작가 참여 마켓 주간 랭킹보기
@@ -225,7 +228,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:gap-6">
+  <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:gap-6">
             {top4.map((p: Product, i: number) => (
             <div key={p.id} className="group">
               <div className="relative h-[180px] w-full overflow-hidden rounded-2xl bg-neutral-200 sm:h-[220px] md:h-[260px]">
@@ -258,54 +261,41 @@ export default function Home() {
       </section>
 
       {/* 하단 3 CTA 카드 */}
-      <section className="bg-white dark:bg-card">
-        <div className="container mx-auto px-4 pb-14 pt-6 md:pb-20 md:pt-10">
-          <h3 className="mb-4 text-[13px] font-medium text-slate-600">
-            함께 성장해요. 고객별 혜택 확인하기
-          </h3>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
-            <Card className="rounded-2xl border-none bg-neutral-200/80 p-0 shadow-none dark:bg-neutral-800/70">
-              <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-8 text-center md:min-h-[180px]">
-                <h4 className="text-base font-bold">창작마켓</h4>
-                <p className="mt-1 text-xs text-slate-500">B2C 참여하기</p>
-              </div>
-              <div className="px-6 pb-6 text-center">
-                <p className="text-[12px] leading-6 text-slate-500">
-                  나만의 작품으로 굿즈를 제작, 등록하여 판매할 수 있습니다.
-                  창작물 판매여부에는 소정의 판매 수수료가 반영이 됩니다.
-                </p>
-              </div>
-            </Card>
-
-            <Card className="rounded-2xl border-none bg-neutral-200/80 p-0 shadow-none dark:bg-neutral-800/70">
-              <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-8 text-center md:min-h-[180px]">
-                <h4 className="text-base font-bold">관공서, 기업, 대량</h4>
-                <p className="mt-1 text-xs text-slate-500">B2B 문의하기</p>
-              </div>
-              <div className="px-6 pb-6 text-center">
-                <p className="text-[12px] leading-6 text-slate-500">
-                  행사/축제/교육/대량 굿즈 제작이 가능합니다. 핀토는 자체 공장과
-                  다양한 프로젝트로 풍부하여 전문 상담가가 함께 합니다.
-                </p>
-              </div>
-            </Card>
-
-            <Card className="rounded-2xl border-none bg-neutral-200/80 p-0 shadow-none dark:bg-neutral-800/70">
-              <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-8 text-center md:min-h-[180px]">
-                <h4 className="text-base font-bold">개인</h4>
-                <p className="mt-1 text-xs text-slate-500">B2C 문의하기</p>
-              </div>
-              <div className="px-6 pb-6 text-center">
-                <p className="text-[12px] leading-6 text-slate-500">
-                  구매량 등급이 나눠져 있어 구매금액에 따라 월 할인 프로모션,
-                  포인트 지급 등이 제공됩니다.
-                </p>
-              </div>
-            </Card>
+      <h3 className="mb-4 text-[13px] font-medium text-slate-600">
+        함께 성장해요. 고객별 혜택 확인하기
+      </h3>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
+        <Card className="rounded-2xl border-none bg-neutral-200/80 p-0 shadow-none dark:bg-neutral-800/70">
+          <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-8 text-center md:min-h-[180px]">
+            <h4 className="text-base font-bold">창작마켓</h4>
+            <p className="mt-1 text-xs text-slate-500">B2C 참여하기</p>
           </div>
+        </Card>
+        <Card className="rounded-2xl border-none bg-neutral-200/80 p-0 shadow-none dark:bg-neutral-800/70">
+          <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-8 text-center md:min-h-[180px]">
+            <h4 className="text-base font-bold">관공서, 기업, 대량</h4>
+            <p className="mt-1 text-xs text-slate-500">B2B 문의하기</p>
+          </div>
+        </Card>
+        <Card className="rounded-2xl border-none bg-neutral-200/80 p-0 shadow-none dark:bg-neutral-800/70">
+          <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-8 text-center md:min-h-[180px]">
+            <h4 className="text-base font-bold">개인</h4>
+            <p className="mt-1 text-xs text-slate-500">B2C 문의하기</p>
+          </div>
+        </Card>
+      </div>
+  <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6 mt-2 mb-12">
+        <div className="text-[13px] leading-5 text-slate-500">
+          나만의 창작물로 굿즈를 제작, 등록하여 판매를 할 수 있습니다.<br />
+          창작물 판매자에게는 소량제작 할인혜택 입점 수수료가 할인이 됩니다.
         </div>
-      </section>
+        <div className="text-[13px] leading-5 text-slate-500">
+          환경디자인,행사,축제,교육,대량 굿즈 제작이 가능합니다. 핀토는 자체 공장과 다양한 포트폴리오를 보유하고 있어 전문 상담가가 함께 합니다.
+        </div>
+        <div className="text-[13px] leading-5 text-slate-500">
+          구매별 등급이 나눠져 있으며 구매등급에 따라 월 할인 프로모션, 포인트 지급 등이 제공됩니다.
+        </div>
+      </div>
     </div>
   );
 }
