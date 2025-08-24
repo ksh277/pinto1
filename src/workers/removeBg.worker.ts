@@ -15,6 +15,6 @@ self.onmessage = function (e) {
     a[i + 2] = Math.round(matte[2] * (1 - k) + b * k);
     a[i + 3] = alpha;
   }
-  // @ts-ignore: transferables for worker
+  // @ts-expect-error: transferables for worker
   self.postMessage(imgData, [imgData.data.buffer]);
 };

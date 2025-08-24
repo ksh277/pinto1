@@ -1,20 +1,19 @@
 'use client';
 
 import { Stage, Layer, Rect, Image as KonvaImage } from 'react-konva';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type Props = {
   width: number;
   height: number;
   image?: HTMLImageElement | null;
-  showGrid?: boolean;
 };
 
 const CM_TO_PX_300DPI = (cm: number) => Math.round(cm * 300 / 2.54); // 300DPI 기준
 const CUT = CM_TO_PX_300DPI(0.8);   // 절제선 0.8cm ≈ 94px
 const BLEED = CM_TO_PX_300DPI(1.5); // 여백 1.5cm ≈ 177px
 
-export default function ProductEditorCanvas({ width, height, image, showGrid }: Props) {
+export default function ProductEditorCanvas({ width, height, image }: Props) {
   // 이미지 contain 스케일 계산
   const [imgXYWH, setImgXYWH] = useState({ x: 0, y: 0, w: width, h: height });
   useEffect(() => {

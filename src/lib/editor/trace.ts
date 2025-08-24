@@ -44,7 +44,7 @@ export function marchingSquares(canvas: HTMLCanvasElement, alphaThreshold = 8) {
   return simplify(path,1.5)
 }
 
-export function simplify(points:{x:number;y:number}[], epsilon=1.2){
+export function simplify(points:{x:number;y:number}[], epsilon=1.2): {x:number;y:number}[]{
   if(points.length<3) return points
   const md=maxDistance(points); if(md.maxDist>epsilon){
     const r1=simplify(points.slice(0,md.index+1),epsilon)
