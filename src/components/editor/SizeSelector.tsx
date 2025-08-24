@@ -1,68 +1,24 @@
+'use client'
+import React, { useState } from 'react'
+import { useEditorStore } from '@/store/editorStore'
 
-'use client';
+const DPI = 300
+const mmToPx = (mm:number) => (mm/25.4)*DPI
 
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import type { CanvasSize } from './EditorLayout';
-
-interface SizeSelectorProps {
-  onSizeSet: (size: CanvasSize) => void;
-}
-
-const DPI = 300;
-const MM_PER_INCH = 25.4;
-
-export function SizeSelector({ onSizeSet }: SizeSelectorProps) {
-  const [width, setWidth] = useState('50');
-  const [height, setHeight] = useState('50');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const widthMM = parseFloat(width);
-    const heightMM = parseFloat(height);
-
-    if (isNaN(widthMM) || isNaN(heightMM) || widthMM <= 0 || heightMM <= 0) {
-      return;
-    }
-
-    const widthPx = Math.round((widthMM / MM_PER_INCH) * DPI);
-    const heightPx = Math.round((heightMM / MM_PER_INCH) * DPI);
-
-    onSizeSet({
-      width: widthPx,
-      height: heightPx,
-      widthMM: widthMM,
-      heightMM: heightMM,
-    });
-  };
-
+export function SizeSelector(){
+  const { state, setSizeMM } = useEditorStore()
+  const [w,setW] = useState(state.size.widthMM)
+  const [h,setH] = useState(state.size.heightMM)
+  const apply = () => setSizeMM(w,h)
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-1">
-        <Label htmlFor="width" className="text-xs">가로 (mm)</Label>
-        <Input
-          id="width"
-          type="number"
-          value={width}
-          onChange={(e) => setWidth(e.target.value)}
-          className="bg-gray-700 border-gray-600 text-white text-xs h-8"
-        />
+    <div className="p-3 border rounded-2xl bg-white">
+      <h3 className="font-semibold mb-2">사이즈(mm)</h3>
+      <div className="grid grid-cols-2 gap-2">
+        <label className="text-sm">W<input value={w} onChange={e=>setW(parseFloat(e.target.value||'0'))} type="number" className="w-full border rounded px-2 py-1"/></label>
+        <label className="text-sm">H<input value={h} onChange={e=>setH(parseFloat(e.target.value||'0'))} type="number" className="w-full border rounded px-2 py-1"/></label>
       </div>
-      <div className="space-y-1">
-        <Label htmlFor="height" className="text-xs">세로 (mm)</Label>
-        <Input
-          id="height"
-          type="number"
-          value={height}
-          onChange={(e) => setHeight(e.target.value)}
-          className="bg-gray-700 border-gray-600 text-white text-xs h-8"
-        />
-      </div>
-      <Button type="submit" size="sm" className="w-full text-xs">
-        적용하기
-      </Button>
-    </form>
-  );
+      <div className="flex gap-2 mt-2"><button onClick={apply} className="rounded-xl border px-3 py-2 w-full">적용</button></div>
+      <div className="mt-2 text-xs text-gray-500">px: {Math.round(mmToPx(w))} x {Math.round(mmToPx(h))}</div>
+    </div>
+  )
 }
