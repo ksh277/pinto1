@@ -493,6 +493,9 @@ export default function ProductDetail() {
                 </Tabs>
               </div>
             </div>
+            <Link href={`/editor`} className="inline-flex items-center rounded-lg border px-3 py-2">
+              이 디자인으로 굿즈 에디터 열기
+            </Link>
 
             <div className="grid grid-cols-2 gap-3">
               <Button onClick={() => handleCartAction('addToCart')} disabled={!selectedSize || !selectedBase} size="lg" variant="outline" className="text-lg">

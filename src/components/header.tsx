@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -91,6 +92,9 @@ export function Header() {
             <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
               <Link href="/community">{t('header.nav.community')}</Link>
             </Button>
+            <Button variant="ghost" asChild className="font-semibold text-lg text-foreground hover:text-primary">
+              <Link href="/editor">굿즈 에디터</Link>
+            </Button>
           </div>
 
           {/* 모바일 아이콘 */}
@@ -152,6 +156,7 @@ export function Header() {
                           )}
                         </AccordionItem>
                       ))}
+                      <div className="border-t"><Link href="/editor" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">굿즈 에디터</Link></div>
                       <div className="border-t"><Link href="/reviews" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">리뷰</Link></div>
                       <div className="border-t"><Link href="/community" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">커뮤니티</Link></div>
                       <div className="border-t"><Link href="/support/notice" onClick={closeMobileMenu} className="flex items-center text-base font-semibold py-3">고객센터</Link></div>

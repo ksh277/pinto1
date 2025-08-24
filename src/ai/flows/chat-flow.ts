@@ -9,6 +9,13 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
+const goodsEditorHelp = `
+- 이미지 업로드 후 "보드/컷라인 생성"을 누르면 자동으로 이미지 외곽 기준 +15mm 보드와 +8mm 절제선이 만들어집니다.
+- 키링 홀은 캔버스의 흰색 원을 드래그하여 보드 둘레 원하는 위치에 둘 수 있어요(둘레 스냅).
+- 템플릿 모드에서는 사각/원/오각/육각 판을 선택 후 이미지를 배치합니다.
+- PNG/SVG/PDF로 내보내거나 DB에 저장할 수 있어요.
+`;
+
 const prompt = ai.definePrompt({
   name: 'chatbotPrompt',
   input: { schema: z.string() },
@@ -19,6 +26,7 @@ Your knowledge is based on the following information:
 - Minimum order quantity for most items is 10 units.
 - We offer discounts on bulk orders.
 - Users can use the "Goods Editor" to design their products.
+${goodsEditorHelp}
 - We support Korean, English, Japanese, and Chinese.
 
 Here is the product list. Prices are in KRW.

@@ -1,0 +1,31 @@
+generator client { provider = "prisma-client-js" }
+
+datasource db {
+  provider = "sqlite" // mysql 로 바꿔도 됨
+  url      = env("DATABASE_URL")
+}
+
+model Design {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  mode           String   // 'auto' | 'template'
+  templateShape  String?  // 'rect' | 'circle' | 'pentagon' | 'hexagon'
+
+  widthMM        Float
+  heightMM       Float
+  dpi            Int
+  bleedMM        Float
+  safeMM         Float
+  borderMM       Float     // +15mm
+  cutOffsetMM    Float     // +8mm
+
+  holeX          Float     // px
+  holeY          Float     // px
+  holeDiameterMM Float
+
+  boardPath      Json?
+  cutlinePath    Json?
+  stateJson      Json
+
+  previewPng     Bytes?
+}

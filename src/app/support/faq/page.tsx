@@ -118,6 +118,13 @@ export default function FaqPage() {
           </div>
         )}
       </Accordion>
+      <h2 className="text-xl font-semibold mt-8">굿즈 에디터 FAQ</h2>
+      <ul className="list-disc pl-6 space-y-2">
+        <li>자동 보드: 업로드 이미지 외곽에서 +15mm 확장, 절제선은 추가 +8mm를 기본으로 합니다.</li>
+        <li>키링 홀: 캔버스의 흰색 원을 드래그하면 보드 둘레에 스냅됩니다. 원하는 위치로 이동하세요.</li>
+        <li>템플릿 모드: 사각/원/오각/육각 판을 선택 후 이미지를 올려 배치합니다.</li>
+        <li>저장: PNG/SVG/PDF 내보내기, 또는 DB에 저장(미리보기 PNG와 설계 JSON 포함)합니다.</li>
+      </ul>
     </div>
   );
 }
