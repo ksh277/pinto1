@@ -1,7 +1,8 @@
 'use client'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
-import { ProductEditor } from './ProductEditor'
+import dynamic from 'next/dynamic'
+const ProductEditor = dynamic(() => import('./ProductEditor').then(m => m.ProductEditor), { ssr: false })
 import { SizeSelector } from './SizeSelector'
 import { ProductTypeSelector } from './ProductTypeSelector'
 
