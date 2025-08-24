@@ -15,8 +15,8 @@ import '@/styles/banner.css';
 export function TopStripBanner() {
   const [banner, setBanner] = useState<Banner | null>(null);
   const [loading, setLoading] = useState(true);
-  const [hideToday, setHideToday] = useState(false);
-  const [hideWeek, setHideWeek] = useState(false);
+  // 하나만 선택되도록 상태를 단일 값으로 관리
+  const [hideOption, setHideOption] = useState<'today' | 'week' | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -57,14 +57,14 @@ export function TopStripBanner() {
   const handleClose = () => {
     if (!banner) return;
 
-    if (hideWeek) {
+    if (hideOption === 'week') {
       const until = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       setHideUntil(banner.id, until);
       console.log('banner_close', {
         id: banner.id,
         choice: 'week',
       });
-    } else if (hideToday) {
+    } else if (hideOption === 'today') {
       const now = new Date();
       const until = new Date(
         now.getFullYear(),
@@ -146,8 +146,8 @@ export function TopStripBanner() {
               id="hideToday"
               type="checkbox"
               className="h-4 w-4"
-              checked={hideToday}
-              onChange={e => setHideToday(e.target.checked)}
+              checked={hideOption === 'today'}
+              onChange={() => setHideOption(hideOption === 'today' ? null : 'today')}
             />
             <label htmlFor="hideToday" className="cursor-pointer select-none text-xs">
               오늘하루 보지 않기
@@ -156,8 +156,8 @@ export function TopStripBanner() {
               id="hideWeek"
               type="checkbox"
               className="h-4 w-4"
-              checked={hideWeek}
-              onChange={e => setHideWeek(e.target.checked)}
+              checked={hideOption === 'week'}
+              onChange={() => setHideOption(hideOption === 'week' ? null : 'week')}
             />
             <label htmlFor="hideWeek" className="cursor-pointer select-none text-xs">
               일주일 간 보지 않기

@@ -213,7 +213,7 @@ export default function Home() {
   <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:gap-6">
             {top4.map((p: Product, i: number) => (
             <div key={p.id} className="group">
-              <div className="relative h-[180px] w-full overflow-hidden rounded-2xl bg-neutral-200 sm:h-[220px] md:h-[260px]">
+              <div className="relative h-[180px] w-full overflow-hidden rounded-2xl bg-neutral-200 sm:h-[220px] md:h-[400px]">
                 <Image
                     src={p.imageUrl || 'https://placehold.co/600x600.png'}
                     alt={p.nameKo || 'product'}

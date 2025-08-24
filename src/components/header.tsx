@@ -85,7 +85,7 @@ export function Header() {
           className="relative"
           onMouseLeave={handleCategoryLeave}
         >
-          <div className="flex h-20 items-center justify-between w-full px-0">
+          <div className="flex h-15 items-center justify-between w-full px-0">
           <Link href="/" className="flex items-center gap-2 text-3xl font-bold ml-8">
             <Image src={require('./img/logo.png')} width={150} height={30} alt="logo" className="object-contain" />
           </Link>
