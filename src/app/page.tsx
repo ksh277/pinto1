@@ -10,8 +10,20 @@ import type { Product } from '@/lib/types';
 import { ChevronRight } from 'lucide-react';
 
 const heroBanners = [
-  { id: '1', href: '#', alt: 'Hand holding a wooden whale craft.', imgSrc: 'https://placehold.co/800x1000.png', hint: 'wooden whale craft' },
-  { id: '2', href: '#', alt: 'Custom wooden coasters with map engravings.', imgSrc: 'https://placehold.co/800x1000.png', hint: 'custom wooden coasters' },
+  {
+    id: '1',
+    href: '#',
+    alt: 'Hand holding a wooden whale craft.',
+    imgSrc: 'https://placehold.co/1600x1000.png',
+    hint: 'wooden whale craft',
+  },
+  {
+    id: '2',
+    href: '#',
+    alt: 'Custom wooden coasters with map engravings.',
+    imgSrc: 'https://placehold.co/1600x1000.png',
+    hint: 'custom wooden coasters',
+  },
 ];
 
 const shortcutCategories = [
@@ -80,13 +92,13 @@ export default function Home() {
   return (
     <div className="flex flex-col bg-slate-50 dark:bg-slate-900">
       {/* HERO */}
-      <section className="container mx-auto px-4 pt-8">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <section className="w-full pt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2">
           {heroBanners.map(banner => (
             <Link
               key={banner.id}
               href={banner.href}
-              className="group relative block h-64 w-full overflow-hidden rounded-2xl md:h-[500px]"
+              className="group relative block h-96 w-full overflow-hidden md:h-[650px]"
             >
               <Image
                 src={banner.imgSrc}
