@@ -50,5 +50,5 @@ export async function POST(req: Request) {
 
 export async function GET() {
   const items = await prisma.design.findMany({ orderBy: { createdAt: 'desc' }, take: 50 })
-  return NextResponse.json({ items: items.map(i => ({ id: i.id, createdAt: i.createdAt, mode: i.mode })) })
+  return NextResponse.json({ items: items.map((i: { id: string; createdAt: Date; mode: string | null }) => ({ id: i.id, createdAt: i.createdAt, mode: i.mode })) })
 }

@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { TopBanner, type HeroBanner } from '@/components/TopBanner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CategoryShortcuts } from '@/components/category-shortcuts';
 import { useProductContext } from '@/contexts/product-context';
 import type { Product } from '@/lib/types';
+import { getWeeklyMarket, type WeeklyMarketItem } from '@/lib/market';
 import { ChevronRight } from 'lucide-react';
 
 const heroBanners: HeroBanner[] = [
@@ -80,13 +82,40 @@ export default function Home() {
   const fmtPrice = (n?: number) =>
     typeof n === 'number' ? `${n.toLocaleString()}원` : '가격문의';
 
-  // 좋아요 순 주간 랭킹 4개
+  // 좋아요 순 주간 랭킹 4개 (폴백용)
   const top4 = [...products]
     .sort(
       (a: Product, b: Product) =>
         (b.stats?.likeCount ?? 0) - (a.stats?.likeCount ?? 0),
     )
     .slice(0, 4);
+
+  type Rankable = {
+    id: string;
+    nameKo?: string;
+    priceKrw?: number;
+    imageUrl?: string;
+    rank?: number;
+  };
+
+  const top4Fallback: Rankable[] = top4.map(p => ({
+    id: p.id,
+    nameKo: p.nameKo,
+    priceKrw: p.priceKrw,
+    imageUrl: p.imageUrl,
+  }));
+  const [weekly, setWeekly] = useState<WeeklyMarketItem[]>([]);
+
+  useEffect(() => {
+    getWeeklyMarket({ limit: 4 })
+      .then(setWeekly)
+      .catch(() => {
+        /* ignore errors, fallback will be used */
+      });
+  }, []);
+
+  const ranking: Rankable[] = weekly.length ? weekly : top4Fallback;
+  const showBadge = weekly.length > 0;
 
   return (
   <div className="flex flex-col bg-slate-50 dark:bg-slate-900 min-h-screen px-8 md:px-16">
@@ -205,13 +234,13 @@ export default function Home() {
           <h2 className="text-[15px] font-semibold text-slate-700">
             창작자, 작가 참여 마켓 주간 랭킹보기
           </h2>
-          <Link href="#" className="text-xs text-slate-400 hover:text-slate-600">
+          <Link href="/market/weekly" className="text-xs text-slate-400 hover:text-slate-600">
             더보기 <ChevronRight className="inline-block h-3 w-3 align-middle" />
           </Link>
         </div>
 
   <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:gap-6">
-            {top4.map((p: Product, i: number) => (
+            {ranking.map((p: Rankable, i: number) => (
             <div key={p.id} className="group">
               <div className="relative h-[180px] w-full overflow-hidden rounded-2xl bg-neutral-200 sm:h-[220px] md:h-[260px]">
                 <Image
@@ -232,9 +261,11 @@ export default function Home() {
                   <span className="text-[13px] font-semibold text-teal-600">
                     {fmtPrice(p.priceKrw)} <span className="text-teal-600/70">부터</span>
                   </span>
+                  {showBadge && (
                   <span className="rounded-md border-2 border-rose-200 px-2 py-[2px] text-[10px] font-semibold text-rose-300">
-                    BEST {i + 1}
+                    BEST {p.rank ?? i + 1}
                   </span>
+                  )}
                 </div>
               </div>
             </div>

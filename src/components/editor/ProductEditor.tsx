@@ -38,7 +38,6 @@ const estimateBgRGBA = (ctx: CanvasRenderingContext2D, w: number, h: number) => 
   }
   return [r/4, g/4, b/4, a/4];
 };
-const colorDist = (a: number[], b: number[]) => Math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2);
 const loadHTMLImage = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
   const img = new window.Image();
   img.crossOrigin = 'anonymous';

@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { Search, ShoppingCart, Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { useI18n } from '@/contexts/i18n-context';
 import Image from 'next/image';
 import { mainNavItems } from '@/lib/categories';
 import { HeaderAuthNav } from './header-auth-nav';
@@ -18,7 +17,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './
 import { TopStripBanner } from './TopStripBanner';
 
 export function Header() {
-  const { t } = useI18n();
   const [activeSubNav, setActiveSubNav] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -72,7 +70,7 @@ export function Header() {
           <div className="flex flex-1 items-center justify-end gap-4">
             <Link href="/register" className="hover:text-primary text-sm">회원가입</Link>
             <Link href="/login" className="hover:text-primary text-sm">로그인</Link>
-            <a href="/mypage/orders" className="hover:text-primary text-sm" onClick={handleOrderClick}>주문조회</a>
+            <Link href="/mypage/orders" className="hover:text-primary text-sm" onClick={handleOrderClick}>주문조회</Link>
           </div>
         </div>
 
