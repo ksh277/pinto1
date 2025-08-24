@@ -1,0 +1,77 @@
+# Admin Audit
+
+## Directory Structure
+
+```
+src/app/admin
+src/app/admin/products
+src/app/admin/products/product-form.tsx
+src/app/admin/products/new
+src/app/admin/products/new/page.tsx
+src/app/admin/products/page.tsx
+src/app/admin/products/edit
+src/app/admin/products/edit/[id]
+src/app/admin/products/edit/[id]/page.tsx
+src/app/admin/guide
+src/app/admin/guide/new
+src/app/admin/guide/new/page.tsx
+src/app/admin/guide/page.tsx
+src/app/admin/guide/edit
+src/app/admin/guide/edit/[id]
+src/app/admin/guide/edit/[id]/page.tsx
+src/app/admin/guide/guide-form.tsx
+src/app/admin/faq
+src/app/admin/faq/new
+src/app/admin/faq/new/page.tsx
+src/app/admin/faq/page.tsx
+src/app/admin/faq/edit
+src/app/admin/faq/edit/[id]
+src/app/admin/faq/edit/[id]/page.tsx
+src/app/admin/faq/faq-form.tsx
+src/app/admin/notice
+src/app/admin/notice/new
+src/app/admin/notice/new/page.tsx
+src/app/admin/notice/notice-form.tsx
+src/app/admin/notice/page.tsx
+src/app/admin/notice/edit
+src/app/admin/notice/edit/[id]
+src/app/admin/notice/edit/[id]/page.tsx
+src/app/admin/page.tsx
+src/app/admin/layout.tsx
+src/app/admin/inquiries
+src/app/admin/inquiries/[id]
+src/app/admin/inquiries/[id]/page.tsx
+src/app/admin/inquiries/page.tsx
+```
+
+## Data Layer
+
+- ORM: Prisma (schema at `prisma/schema.prisma`)
+- Default datasource: SQLite via `DATABASE_URL` env var.
+
+## Environment Variables
+
+| Variable | Description |
+| --- | --- |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Web API key |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase auth domain |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase project ID |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase app ID |
+| `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID` | Firebase measurement ID |
+| `NEXT_PUBLIC_FIREBASE_USE_EMULATORS` | Use local Firebase emulators |
+| `PORTONE_API_KEY` | Payment provider API key |
+| `PORTONE_API_SECRET` | Payment provider secret |
+| `WEBHOOK_SECRET` | Webhook signing secret |
+| `GEMINI_API_KEY` | Gemini API key |
+| `DB_HOST` | Database host |
+| `DB_PORT` | Database port |
+| `DB_USER` | Database user |
+| `DB_PASSWORD` | Database password |
+| `DB_NAME` | Database name |
+| `DATABASE_URL` | Prisma database URL |
+
+## Notes
+
+The current Prisma schema only defines a `Design` model. No admin-specific tables (banners, categories, products, etc.) are present.
