@@ -29,4 +29,15 @@ export interface EditorState {
   cutlinePath?: { path: PathPoint[] }
 
   hole: { x: number; y: number; diameterMM: number; snapToPerimeter: boolean }
+
+  ui: {
+    zoom: number
+    isPanning: boolean
+    sizeLocked: boolean
+    ringCount: number
+    ringFront: boolean
+    ringBack: boolean
+    ringSizeMM: number
+    whiteWrap: number
+  }
 }
