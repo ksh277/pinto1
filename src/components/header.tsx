@@ -221,7 +221,7 @@ export function Header() {
                     <Link href="#" className="hover:text-primary">단체판촉상품(제품뷰)</Link>
                     <Link href="#" className="hover:text-primary">IP굿즈 상품개발(페이지)</Link>
                     <Link href="#" className="hover:text-primary">브랜드의뢰(페이지)</Link>
-                    <Link href="#" className="hover:text-primary">리뷰(게시판)</Link>
+                    <Link href="/reviews" className="hover:text-primary">리뷰(게시판)</Link>
                     <Link href="#" className="hover:text-primary">상품주문 가이드(페이지)</Link>
                   </div>
                 </div>

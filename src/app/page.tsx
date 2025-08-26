@@ -139,7 +139,7 @@ export default function Home() {
           {infoCards.map(card => (
             <div
               key={card.id}
-              className="min-h-[300px] md:min-h-[340px] rounded-2xl bg-neutral-200/80 dark:bg-neutral-800/70 pt-14 md:pt-16 pb-8 px-6"
+              className="min-h-[300px] md:min-h-[340px] rounded-2xl bg-neutral-200/80 dark:bg-neutral-800/70 pt-14 md:pt-60 pb-8 px-6"
             >
               <h3 className="text-[15px] font-semibold leading-6 text-neutral-900 dark:text-neutral-100 break-keep">
                 {card.title}
@@ -177,7 +177,7 @@ export default function Home() {
         <div className="mt-4 space-y-4">
           {shelf.picks.map((p: Product) => (
             <div key={p.id} className="flex items-center gap-3">
-              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-neutral-200">
+              <Link href={`/products/${p.id}`} className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-neutral-200 block">
                 <Image
                   src={p.imageUrl || 'https://placehold.co/300x300.png'}
                   alt={p.nameKo || 'product'}
@@ -185,7 +185,7 @@ export default function Home() {
                   sizes="64px"
                   className="object-cover"
                 />
-              </div>
+              </Link>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[12px] text-slate-500">
                   {p.nameKo || '상품명'}
