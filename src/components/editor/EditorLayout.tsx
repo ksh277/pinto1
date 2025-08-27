@@ -65,10 +65,11 @@ function ToolbarPrimaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElemen
 
 /** 좌측 레일 */
 function LeftRail() {
-  const { state, setMode, setTemplate, setSizeMM, lockSize, addImageFromSrc, addText } = useEditorStore() as any
+  const { state, setMode, setTemplate, setSizeMM, lockSize, addImageFromSrc, addText, setBgSample, setBgThreshold, setCutOffsetMM, setWhiteShrinkMM } = useEditorStore() as any
   const [w, setW] = React.useState(state.size.widthMM)
   const [h, setH] = React.useState(state.size.heightMM)
   const fileRef = React.useRef<HTMLInputElement>(null)
+  const firstImg = state.nodes.find((n: any) => n.type === 'image') as any
 
   return (
     <aside className="flex h-full flex-col bg-[#2b2b2b] text-white">
@@ -95,11 +96,46 @@ function LeftRail() {
           <input id="file-input" ref={fileRef} type="file" accept="image/*" hidden
                  onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>addImageFromSrc(r.result as string); r.readAsDataURL(f) }}}/>
           <button className="w-full rounded bg-white px-3 py-2 text-black" onClick={()=>fileRef.current?.click()} disabled={!state.ui.sizeLocked}>이미지 불러오기</button>
+          {firstImg ? (
+            <div className="mt-2">
+              <img src={firstImg.src} alt="preview" className="w-full cursor-crosshair" onClick={e=>{
+                const img=e.currentTarget
+                const rect=img.getBoundingClientRect()
+                const x=e.clientX-rect.left, y=e.clientY-rect.top
+                const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight
+                const ctx=c.getContext('2d')!; ctx.drawImage(img,0,0)
+                const sx=Math.floor(x*img.naturalWidth/rect.width)
+                const sy=Math.floor(y*img.naturalHeight/rect.height)
+                const d=ctx.getImageData(sx,sy,1,1).data
+                setBgSample([d[0],d[1],d[2]])
+              }} />
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-xs text-gray-400">배경제거 임계값</span>
+                <input type="range" min={0} max={128} value={state.bgThreshold} onChange={e=>setBgThreshold(parseInt(e.target.value))} />
+                <span className="w-8 text-center">{state.bgThreshold}</span>
+              </div>
+              <div className="mt-1 text-xs text-gray-400">이미지 위를 클릭하면 배경색 샘플링</div>
+            </div>
+          ) : null}
         </div>
 
         <div>
           <div className="mb-2 text-gray-300">텍스트</div>
           <button className="w-full rounded border border-white/30 px-3 py-2" onClick={()=>addText('텍스트')} disabled={!state.ui.sizeLocked}>텍스트 추가</button>
+        </div>
+
+        <div>
+          <div className="mb-2 text-gray-300">컷/화이트</div>
+          <div className="space-y-2">
+            <div>
+              <input type="range" min={2} max={15} value={state.offsets.cutOffsetMM} onChange={e=>setCutOffsetMM(parseFloat(e.target.value))} />
+              <div className="mt-1 text-xs">컷 오프셋 {state.offsets.cutOffsetMM.toFixed(1)}mm</div>
+            </div>
+            <div>
+              <input type="range" min={0.06} max={0.10} step={0.01} value={state.whiteShrinkMM} onChange={e=>setWhiteShrinkMM(parseFloat(e.target.value))} />
+              <div className="mt-1 text-xs">화이트 수축 {state.whiteShrinkMM.toFixed(2)}mm</div>
+            </div>
+          </div>
         </div>
 
         {state.mode==='template' && (

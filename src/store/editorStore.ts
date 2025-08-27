@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { produce } from 'immer'
 import type {
-  EditorNode, EditorState, ImageNode, TextNode, ShapeNode, ShapeKind, TemplatePlate
+  EditorNode, EditorState, ImageNode, TextNode, ShapeNode, ShapeKind, TemplatePlate, PathPoint
 } from '@/types/editor'
 
 const DPI = 300
@@ -20,9 +20,13 @@ const initialState: EditorState = {
   showGuides: false,
   mode: 'auto',
   templatePlate: 'rect',
-  offsets: { borderMM: 15, cutOffsetMM: 8 },
+  offsets: { borderMM: 15, cutOffsetMM: 10 },
   boardPath: undefined,
   cutlinePath: undefined,
+  whitePath: undefined,
+  bgSampleRGB: undefined,
+  bgThreshold: 28,
+  whiteShrinkMM: 0.08,
   hole: { x: mmToPx(35), y: mmToPx(6), diameterMM: 4, snapToPerimeter: true },
 
   // --- UI (올댓프린팅 스타일)
@@ -61,8 +65,12 @@ interface Store {
   removeSelected: () => void
   duplicateSelected: () => void
   setSizeMM: (w: number, h: number) => void
-  setPaths: (board?: EditorState['boardPath'], cut?: EditorState['cutlinePath']) => void
+  setPaths: (board?: { path: PathPoint[] }, cut?: { path: PathPoint[] }, white?: { path: PathPoint[] }) => void
   setHole: (x: number, y: number, diameterMM?: number) => void
+  setBgSample: (rgb: [number, number, number]) => void
+  setBgThreshold: (v: number) => void
+  setCutOffsetMM: (mm: number) => void
+  setWhiteShrinkMM: (mm: number) => void
 
   // UI
   setZoom: (z: number) => void
@@ -119,8 +127,12 @@ export const useEditorStore = create<Store>()(devtools((set, get) => ({
     const pxW = mmToPx(w, d.size.dpi), pxH = mmToPx(h, d.size.dpi)
     d.size.widthMM = w; d.size.heightMM = h; d.stageWidth = pxW; d.stageHeight = pxH
   }),
-  setPaths: (board, cut) => get().set((d) => { d.boardPath = board; d.cutlinePath = cut }),
+  setPaths: (board, cut, white) => get().set((d) => { d.boardPath = board; d.cutlinePath = cut; d.whitePath = white }),
   setHole: (x, y, diameterMM) => get().set((d) => { d.hole.x = x; d.hole.y = y; if (diameterMM) d.hole.diameterMM = diameterMM }),
+  setBgSample: (rgb) => get().set((d) => { d.bgSampleRGB = rgb }),
+  setBgThreshold: (v) => get().set((d) => { d.bgThreshold = Math.max(0, Math.min(128, v)) }),
+  setCutOffsetMM: (mm) => get().set((d) => { d.offsets.cutOffsetMM = Math.max(2, Math.min(15, mm)) }),
+  setWhiteShrinkMM: (mm) => get().set((d) => { d.whiteShrinkMM = Math.max(0.06, Math.min(0.10, mm)) }),
 
   setZoom: (z) => get().set((d) => { d.ui.zoom = Math.min(4, Math.max(0.25, z)) }),
   zoomIn: () => get().set((d) => { d.ui.zoom = Math.min(4, d.ui.zoom + 0.1) }),

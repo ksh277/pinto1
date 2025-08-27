@@ -27,6 +27,14 @@ export interface EditorState {
   offsets: { borderMM: number; cutOffsetMM: number }
   boardPath?: { path: PathPoint[] }
   cutlinePath?: { path: PathPoint[] }
+  whitePath?: { path: PathPoint[] }
+
+  // ★ 배경 제거
+  bgSampleRGB?: [number, number, number]
+  bgThreshold: number
+
+  // ★ 화이트/컷 파라미터(mm 단위)
+  whiteShrinkMM: number
 
   hole: { x: number; y: number; diameterMM: number; snapToPerimeter: boolean }
 

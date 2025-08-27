@@ -1,12 +1,14 @@
 'use client'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import React, { useRef, useEffect, useMemo, useState } from 'react'
+import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react'
 import { Stage, Layer, Line, Circle, Image as KImage, Text as KText, Transformer } from 'react-konva'
 import useImage from 'use-image'
 import JSZip from 'jszip'
+import { jsPDF } from 'jspdf'
 import { useEditorStore } from '@/store/editorStore'
 import type { ImageNode, TextNode } from '@/types/editor'
+import { alphaToMaskCanvas, removeBySampleToCanvas, dilateAlpha, erodeAlpha, canvasToPng, marchingSquares, polyToPathPoints, unionEarAndHole } from '@/lib/editor/trace'
 
 // --- 유틸 함수 직접 정의 (원래 '@/utils/geom'에서 import하던 것들) ---
 const mmToPx = (mm: number, dpi = 300) => (mm / 25.4) * dpi;
@@ -186,6 +188,7 @@ export function ProductEditor() {
   const { nodes, selectedIds } = store.state
   const selSet = new Set(selectedIds)
   const stageRef = useRef<any>(null)
+  const [lowDpi, setLowDpi] = useState(false)
 
   const dpi = store.state.size.dpi
   const cutMM = store.state.size.cutMM ?? 8
@@ -260,9 +263,67 @@ export function ProductEditor() {
       })
 
       // 컷라인/보드 = 컨투어로 업데이트
-      store.setPathsAfterAutoFit({ boardPath: { path: fittedPoly }, cutlinePath: { path: fittedPoly } })
+      store.setPaths({ path: fittedPoly }, { path: fittedPoly })
     } finally { setRemoving(false) }
   }
+
+  // auto pipeline: background removal, union, paths
+  useEffect(() => {
+    const imgNode = store.state.nodes.find((n: any) => n.type === 'image') as ImageNode | undefined
+    if (!imgNode || !store.state.ui.sizeLocked) return
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = async () => {
+      const processed = store.state.bgSampleRGB
+        ? removeBySampleToCanvas(img, store.state.bgSampleRGB, store.state.bgThreshold)
+        : (() => { const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight; c.getContext('2d')!.drawImage(img,0,0); return c })()
+
+      const wPx = mmToPx(store.state.size.widthMM, store.state.size.dpi)
+      const hPx = mmToPx(store.state.size.heightMM, store.state.size.dpi)
+      const board=document.createElement('canvas'); board.width=wPx; board.height=hPx
+      const bctx=board.getContext('2d')!
+      const scale=Math.min(wPx/processed.width, hPx/processed.height)
+      const offX=(wPx-processed.width*scale)/2
+      const offY=(hPx-processed.height*scale)/2
+      bctx.drawImage(processed,0,0,processed.width,processed.height,offX,offY,processed.width*scale,processed.height*scale)
+
+      const effDpi = store.state.size.dpi / scale
+      setLowDpi(effDpi < 200)
+
+      const fittedUrl = canvasToPng(board)
+      const mask = await alphaToMaskCanvas(fittedUrl)
+      const { union, holes } = unionEarAndHole(mask, {
+        side: 'top',
+        count: Math.min(2, store.state.ui.ringCount) as 1|2,
+        holeRpx: mmToPx(store.state.ui.ringSizeMM/2, store.state.size.dpi),
+        earRpx: mmToPx(store.state.ui.ringSizeMM/2 + 2.5, store.state.size.dpi),
+        safePadPx: mmToPx(2, store.state.size.dpi)
+      })
+
+      // validation: hole centers inside original mask
+      const mctx = mask.getContext('2d')!
+      for(const h of holes){
+        if(mctx.getImageData(Math.round(h.cx),Math.round(h.cy),1,1).data[3] < 10){
+          console.warn('Hole outside')
+        }
+      }
+
+      const boardPoly = marchingSquares(union)
+      const whiteMask = erodeAlpha(union, Math.round(mmToPx(store.state.whiteShrinkMM, store.state.size.dpi)))
+      const whitePoly = marchingSquares(whiteMask)
+      const cutMask = dilateAlpha(union, Math.round(mmToPx(store.state.offsets.cutOffsetMM, store.state.size.dpi)))
+      const cutPoly = marchingSquares(cutMask)
+
+      const boardBounds = boundsOf(boardPoly)
+      const whiteBounds = boundsOf(whitePoly)
+      if (whiteBounds.x < boardBounds.x || whiteBounds.y < boardBounds.y || whiteBounds.x+whiteBounds.w > boardBounds.x+boardBounds.w || whiteBounds.y+whiteBounds.h > boardBounds.y+boardBounds.h) {
+        console.warn('White outside color')
+      }
+
+      store.setPaths(polyToPathPoints(boardPoly), polyToPathPoints(cutPoly), polyToPathPoints(whitePoly))
+    }
+    img.src = imgNode.src
+  }, [store.state.nodes, store.state.ui.sizeLocked, store.state.bgSampleRGB, store.state.bgThreshold, store.state.offsets.cutOffsetMM, store.state.whiteShrinkMM, store.state.ui.ringCount, store.state.ui.ringSizeMM])
 
   /* ---------- 줌/팬 ---------- */
   const onWheel = (e: any) => {
@@ -300,6 +361,40 @@ export function ProductEditor() {
     const p = projectHole(pointer)
     store.updateHoleAt?.(i, { x: p.x, y: p.y })
   }
+
+  const exportPdf = useCallback(() => {
+    const wMm = store.state.size.widthMM, hMm = store.state.size.heightMM
+    const doc = new jsPDF({ unit:'mm', format:[wMm, hMm], orientation:'portrait' })
+
+    const imageData = stageRef.current?.toCanvas()?.toDataURL('image/png')
+    if (imageData) doc.addImage(imageData, 'PNG', 0, 0, wMm, hMm)
+
+    doc.addPage([wMm,hMm], 'portrait')
+    if (store.state.whitePath?.path?.length){
+      doc.setFillColor(0,0,0); doc.setDrawColor(0,0,0); doc.setLineWidth(0.25)
+      const pts = store.state.whitePath.path
+      doc.lines(pts.map((p,i,arr)=>{const prev=i?arr[i-1]:arr[0]; return [(p.x-prev.x)*25.4/store.state.size.dpi,(p.y-prev.y)*25.4/store.state.size.dpi]}),
+        pts[0].x*25.4/store.state.size.dpi, pts[0].y*25.4/store.state.size.dpi, [1,1], 'F', true)
+    }
+
+    doc.addPage([wMm,hMm], 'portrait')
+    if (store.state.cutlinePath?.path?.length){
+      doc.setDrawColor(0,0,0); doc.setLineWidth(0.25)
+      const pts = store.state.cutlinePath.path
+      doc.lines(pts.map((p,i,arr)=>{const prev=i?arr[i-1]:arr[0]; return [(p.x-prev.x)*25.4/store.state.size.dpi,(p.y-prev.y)*25.4/store.state.size.dpi]}),
+        pts[0].x*25.4/store.state.size.dpi, pts[0].y*25.4/store.state.size.dpi, [1,1], 'S', true)
+    }
+
+    doc.save(`ACRYLIC_${wMm}x${hMm}_CWC.pdf`)
+  }, [stageRef, store.state.whitePath, store.state.cutlinePath, store.state.size])
+
+  useEffect(() => {
+    const btn = document.getElementById('btn-pdf')
+    if (!btn) return
+    const handler = () => exportPdf()
+    btn.addEventListener('click', handler)
+    return () => btn.removeEventListener('click', handler)
+  }, [exportPdf])
 
   /* =================================================================
    * UI
@@ -348,6 +443,7 @@ export function ProductEditor() {
 
       {/* 캔버스 */}
       <div className="relative mx-auto min-h-[560px] w-full max-w-[1400px] bg-neutral-100">
+        {lowDpi && <div className="absolute right-2 top-2 rounded bg-yellow-200 px-2 py-1 text-xs text-black">200dpi 미만</div>}
         <div className="m-6 rounded-md border border-dashed border-gray-300 bg-white/90 p-4 shadow-inner">
           <Stage
             ref={stageRef}
@@ -375,13 +471,17 @@ export function ProductEditor() {
                 ? <Line points={store.boardPath.path.flatMap((p: any) => [p.x, p.y])} closed stroke="#9ca3af" strokeWidth={2} fill="#fff" />
                 : null}
 
-              {store.cutlinePath?.path?.length
-                ? <Line points={store.cutlinePath.path.flatMap((p: any) => [p.x, p.y])} closed stroke="#3b82f6" strokeWidth={2} />
-                : null}
+                {store.cutlinePath?.path?.length
+                  ? <Line points={store.cutlinePath.path.flatMap((p: any) => [p.x, p.y])} closed stroke="#3b82f6" strokeWidth={2} />
+                  : null}
 
-              {safePath?.length
-                ? <Line points={safePath.flatMap((p: {x: number; y: number}) => [p.x, p.y])} closed stroke="#10b981" dash={[6, 6]} strokeWidth={1} />
-                : null}
+                {store.whitePath?.path?.length
+                  ? <Line points={store.whitePath.path.flatMap((p: any) => [p.x, p.y])} closed stroke="#16a34a" opacity={0.7} />
+                  : null}
+
+                {safePath?.length
+                  ? <Line points={safePath.flatMap((p: {x: number; y: number}) => [p.x, p.y])} closed stroke="#10b981" dash={[6, 6]} strokeWidth={1} />
+                  : null}
 
               {kissPath?.length
                 ? <Line points={kissPath.flatMap((p: {x: number; y: number}) => [p.x, p.y])} closed stroke="#8b5cf6" dash={[6, 6]} strokeWidth={1} />
