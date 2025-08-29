@@ -383,8 +383,13 @@ export default function ProductEditor() {
     if (!imgEl) return
     const ratio = s.ui.previewPixelRatio
     const wMm = s.size.widthMM, hMm = s.size.heightMM
+    const stage = stageRef.current.getStage()
+    const prev = { w: stage.width(), h: stage.height(), sx: stage.scaleX(), sy: stage.scaleY(), x: stage.x(), y: stage.y() }
+    stage.width(W); stage.height(H); stage.scale({ x: 1, y: 1 }); stage.position({ x: 0, y: 0 }); stage.batchDraw()
+    const data = stage.toDataURL({ pixelRatio: ratio })
+    stage.width(prev.w); stage.height(prev.h); stage.scale({ x: prev.sx, y: prev.sy }); stage.position({ x: prev.x, y: prev.y }); stage.batchDraw()
+
     const doc = new jsPDF({ unit: 'mm', format: [wMm, hMm], orientation: 'portrait', compress: true })
-    const data = stageRef.current.getStage().toDataURL({ pixelRatio: ratio })
     doc.addImage(data, 'PNG', 0, 0, wMm, hMm)
     doc.addPage([wMm, hMm], 'portrait')
     if (s.whitePath?.path?.length) drawPolyline(doc, s.whitePath.path, s.dpi, true)
@@ -394,7 +399,11 @@ export default function ProductEditor() {
   }
 
   const exportPng = () => {
-    const url = stageRef.current.getStage().toDataURL({ pixelRatio: s.ui.previewPixelRatio })
+    const stage = stageRef.current.getStage()
+    const prev = { w: stage.width(), h: stage.height(), sx: stage.scaleX(), sy: stage.scaleY(), x: stage.x(), y: stage.y() }
+    stage.width(W); stage.height(H); stage.scale({ x: 1, y: 1 }); stage.position({ x: 0, y: 0 }); stage.batchDraw()
+    const url = stage.toDataURL({ pixelRatio: s.ui.previewPixelRatio })
+    stage.width(prev.w); stage.height(prev.h); stage.scale({ x: prev.sx, y: prev.sy }); stage.position({ x: prev.x, y: prev.y }); stage.batchDraw()
     const a = document.createElement('a')
     a.href = url
     a.download = 'preview.png'
@@ -430,6 +439,16 @@ export default function ProductEditor() {
             <button className="btn btn-sm join-item" onClick={fitToBoard}>Fit</button>
           </div>
 
+          {/* Quality meter */}
+          {imgEl && (
+            (() => {
+              const effDpi = Math.min(s.dpi / imgScale.x, s.dpi / imgScale.y)
+              const label = effDpi >= 300 ? '품질 우수' : effDpi >= 200 ? '보통' : '낮음'
+              const color = effDpi >= 300 ? 'text-emerald-600' : effDpi >= 200 ? 'text-amber-600' : 'text-red-600'
+              return <div className={`text-xs ${color}`}>효과 DPI ≈ {Math.round(effDpi)} ({label})</div>
+            })()
+          )}
+
           <div className="divider divider-horizontal" />
 
           {/* Tools */}
@@ -457,6 +476,12 @@ export default function ProductEditor() {
           <div className="divider divider-horizontal" />
           <button className="btn btn-sm" onClick={exportPng}>PNG</button>
           <button className="btn btn-sm" onClick={exportPdf}>PDF</button>
+          <div className="join">
+            <span className="btn btn-sm join-item no-animation">Res</span>
+            <button className="btn btn-sm join-item" onClick={() => useEditorStore.getState().setPreviewPixelRatio(1)}>1x</button>
+            <button className="btn btn-sm join-item" onClick={() => useEditorStore.getState().setPreviewPixelRatio(2)}>2x</button>
+            <button className="btn btn-sm join-item" onClick={() => useEditorStore.getState().setPreviewPixelRatio(3)}>3x</button>
+          </div>
         </div>
       </div>
 

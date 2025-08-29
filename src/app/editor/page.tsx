@@ -1,10 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import { EditorLayout } from "@/components/editor/EditorLayout";
+import ProductEditor from "@/components/editor/ProductEditor";
 
-export default function EditorPage() {
-  const [picked, setPicked] = useState<null | string>(null);
-  return <>{!picked ? <ProductPicker onPick={setPicked} /> : <EditorLayout>{null}</EditorLayout>}</>;
+export default function EditorPage({ searchParams }: { searchParams?: Record<string, string> }) {
+  const initial = (searchParams && (searchParams.template || searchParams.type)) ?? null;
+  const [picked, setPicked] = useState<null | string>(initial);
+  // When a product is picked (or a template/type is provided), render the editor
+  return <>{!picked ? <ProductPicker onPick={setPicked} /> : <EditorLayout><ProductEditor /></EditorLayout>}</>;
 }
 
 function ProductPicker({ onPick }: { onPick: (id: string) => void }) {

@@ -47,7 +47,7 @@ type EditorState = {
   whitePath: PathShape | null;
   cutlinePath: PathShape | null;
 
-  ui: { previewPixelRatio: 1 | 2 };
+  ui: { previewPixelRatio: 1 | 2 | 3 };
 
   // actions
   setDpi: (d: 300 | 600) => void;
@@ -79,6 +79,7 @@ type EditorState = {
   removeShape: (id: string) => void;
 
   setPaths: (board: PathShape, cut: PathShape, white: PathShape) => void;
+  setPreviewPixelRatio: (r: 1 | 2 | 3) => void;
 };
 
 const genId = () => `id_${Date.now().toString(36)}_${Math.floor(Math.random() * 1e6).toString(36)}`;
@@ -113,7 +114,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   whitePath: { path: [] },
   cutlinePath: { path: [] },
 
-  ui: { previewPixelRatio: 1 },
+  ui: { previewPixelRatio: 2 },
 
   setDpi: (d) => set({ dpi: d }),
   setSizeMM: (w, h) => set({ size: { widthMM: mm(w), heightMM: mm(h) } }),
@@ -171,4 +172,5 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   removeShape: (id) => set((s) => ({ shapes: s.shapes.filter((sh) => sh.id !== id) })),
 
   setPaths: (board, cut, white) => set({ boardPath: board, cutlinePath: cut, whitePath: white }),
+  setPreviewPixelRatio: (r) => set({ ui: { previewPixelRatio: r } }),
 }));
