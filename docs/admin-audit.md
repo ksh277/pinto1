@@ -53,14 +53,6 @@ src/app/admin/inquiries/page.tsx
 
 | Variable | Description |
 | --- | --- |
-| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Web API key |
-| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase auth domain |
-| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase project ID |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket |
-| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase messaging sender ID |
-| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase app ID |
-| `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID` | Firebase measurement ID |
-| `NEXT_PUBLIC_FIREBASE_USE_EMULATORS` | Use local Firebase emulators |
 | `PORTONE_API_KEY` | Payment provider API key |
 | `PORTONE_API_SECRET` | Payment provider secret |
 | `WEBHOOK_SECRET` | Webhook signing secret |

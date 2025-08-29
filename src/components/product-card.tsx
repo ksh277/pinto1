@@ -1,43 +1,11 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Heart } from 'lucide-react';
 import type { Product } from '@/lib/types';
 import Link from 'next/link';
-import { toggleLike, getLikeCount, getMyLike } from '@/lib/likes';
 
 export function ProductCard({ product }: { product: Product }) {
-  const [liked, setLiked] = useState(false);
-  const [counts, setCounts] = useState({
-    like: product.stats?.likeCount ?? 0,
-    review: product.stats?.reviewCount ?? 0,
-  });
-
-  useEffect(() => {
-    getLikeCount(product.id).then((c) =>
-      setCounts((prev) => ({ ...prev, like: c }))
-    );
-    getMyLike(product.id).then(setLiked);
-  }, [product.id]);
-
-  const onToggle = async () => {
-    const prevLiked = liked;
-    const prevCount = counts.like;
-    setLiked(!prevLiked);
-    setCounts((p) => ({ ...p, like: prevLiked ? p.like - 1 : p.like + 1 }));
-    try {
-      await toggleLike(product.id);
-    } catch (e) {
-      setLiked(prevLiked);
-      setCounts((p) => ({ ...p, like: prevCount }));
-      const msg = e instanceof Error ? e.message : 'error';
-      if (msg === 'login-required') alert('로그인이 필요합니다.');
-      else alert('좋아요 처리 중 오류가 발생했습니다.');
-    }
-  };
-
   return (
     <div className="group rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-200 hover:shadow-md dark:bg-slate-800 dark:ring-slate-700">
       <Link href={`/products/${product.id}`} className="block">
@@ -59,21 +27,11 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="text-[15px] font-semibold text-slate-900 dark:text-slate-100">
           {product.priceKrw?.toLocaleString()}원~
         </div>
-        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-          <button
-            className={`flex items-center gap-1 transition ${
-              liked ? 'text-rose-500' : 'hover:text-slate-700 dark:hover:text-slate-200'
-            }`}
-            onClick={onToggle}
-            aria-label="좋아요"
-          >
-            <Heart
-              className={`h-4 w-4 ${liked ? 'fill-rose-500 text-rose-500' : ''}`}
-            />
-            {(counts.like ?? 0) > 0 && <span>{counts.like}</span>}
-          </button>
-           {(counts.review ?? 0) > 0 && <span>후기 {counts.review}</span>}
-        </div>
+        {product.stats?.reviewCount ? (
+          <div className="text-xs text-slate-500 dark:text-slate-400">
+            후기 {product.stats.reviewCount}
+          </div>
+        ) : null}
       </div>
     </div>
   );
