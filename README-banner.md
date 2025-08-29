@@ -19,6 +19,6 @@ This module provides a dismissible banner shown at the top of the home page.
 Run lints and type checks:
 
 ```bash
-pnpm lint
-pnpm type-check
+npm run lint
+npm run type-check
 ```

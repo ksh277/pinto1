@@ -1,25 +1,18 @@
-// Firestore 연동 예시 (DB 교체 전 임시)
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { app } from './firebase';
-
-const db = getFirestore(app);
-const BANNERS = 'main_banners';
-
+// Placeholder implementations; replace with real data source.
 export async function fetchBanners() {
-  const snap = await getDocs(collection(db, BANNERS));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return [];
 }
 
 export async function addBanner({ imageUrl, title }: { imageUrl: string; title: string }) {
-  return await addDoc(collection(db, BANNERS), { imageUrl, title, createdAt: Date.now() });
+  return Promise.resolve({ imageUrl, title });
 }
 
 export async function removeBanner(id: string) {
-  return await deleteDoc(doc(db, BANNERS, id));
+  return Promise.resolve();
 }
 
 export async function updateBanner(id: string, data: { imageUrl?: string; title?: string }) {
-  return await updateDoc(doc(db, BANNERS, id), data);
+  return Promise.resolve({ id, ...data });
 }
 export type Banner = {
   id: string;

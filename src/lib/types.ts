@@ -50,8 +50,8 @@ export interface Product {
     ratingSum: number;
     avgRating: number;
   };
-    createdAt: Date | import('firebase/firestore').Timestamp; // Can be Date or Firestore Timestamp
-    updatedAt: Date | import('firebase/firestore').Timestamp; // Can be Date or Firestore Timestamp
+    createdAt: Date;
+    updatedAt: Date;
   categoryKo?: string;
 }
 
@@ -248,7 +248,7 @@ export interface Order {
     status: PaymentStatus;
     provider: "portone" | string;
     transactionId: string | null;
-    paidAt: Date | import('firebase/firestore').Timestamp; // Timestamp
+    paidAt: Date;
   };
   shipping: {
     recipient: {
@@ -262,13 +262,13 @@ export interface Order {
     carrier: string | null;
     trackingNumber: string | null;
     status: ShippingStatus;
-    estimatedDelivery: Date | import('firebase/firestore').Timestamp | null; // Timestamp
-    updatedAt: Date | import('firebase/firestore').Timestamp; // Timestamp
+    estimatedDelivery: Date | null;
+    updatedAt: Date;
   };
   memo?: string;
   channel: 'web' | 'app';
-  createdAt: Date | import('firebase/firestore').Timestamp; // Timestamp
-  updatedAt: Date | import('firebase/firestore').Timestamp; // Timestamp
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Payment {
@@ -279,7 +279,7 @@ export interface Payment {
     amount: number;
     currency: 'KRW';
     raw: Record<string, unknown>; // Raw webhook payload
-    capturedAt: Date | import('firebase/firestore').Timestamp; // Timestamp
-    refundedAt?: Date | import('firebase/firestore').Timestamp; // Timestamp
-    createdAt: Date | import('firebase/firestore').Timestamp; // Timestamp
+    capturedAt: Date;
+    refundedAt?: Date;
+    createdAt: Date;
 }

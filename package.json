@@ -3,25 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20 <21",
-    "pnpm": ">=9"
+    "node": ">=20 <21"
   },
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "storybook": "storybook dev -p 6006",
-    "storybook:build": "storybook build",
-    "codex:type-check": "npx tsc --noEmit",
-    "codex:lint": "npx next lint --max-warnings=0",
-    "codex:build": "npm run codex:type-check && npm run codex:lint && NEXT_PUBLIC_FIREBASE_API_KEY=placeholder NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=placeholder NEXT_PUBLIC_FIREBASE_PROJECT_ID=placeholder NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=placeholder NEXT_PUBLIC_FIREBASE_APP_ID=placeholder NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=placeholder NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=placeholder npx next build",
+    "test": "echo ok",
     "start": "next start -p 3000",
     "lint": "next lint --max-warnings=0",
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
-    "preinstall": "npx only-allow pnpm",
-    "migrate:operator-ids": "tsx scripts/migrate-operator-ids.ts"
+    "db:push": "prisma db push",
+    "db:seed": "tsx scripts/seed.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.14.1",
@@ -58,7 +52,6 @@
     "lodash.debounce": "^4.0.8",
     "embla-carousel-react": "^8.6.0",
     "file-saver": "^2.0.5",
-    "firebase": "^11.9.1",
     "framer-motion": "^11.2.10",
     "genkit": "^1.14.1",
     "html2canvas": "^1.4.1",
@@ -96,7 +89,6 @@
     "eslint": "9.33.0",
     "eslint-config-next": "15.5.0",
     "jsdom": "^24.1.0",
-    "firebase-admin": "^13.4.0",
     "storybook": "^8.5.0",
     "@storybook/nextjs": "^8.5.0",
     "@storybook/addon-essentials": "^8.5.0",

@@ -27,10 +27,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/useLanguage';
 import Image from 'next/image';
-import PostCreate from '@/components/community/PostCreate';
-import PostList from '@/components/community/PostList';
-import ReviewForm from '@/components/reviews/ReviewForm';
-import ReviewList from '@/components/reviews/ReviewList';
 import { toggleLike, getLikeCount, getMyLike } from '@/lib/likes';
 
 export default function ProductDetail() {
@@ -45,7 +41,6 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  const [reviewRefresh, setReviewRefresh] = useState(0);
 
   // State management
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -525,30 +520,17 @@ export default function ProductDetail() {
 
         <div className="mt-12">
           <Tabs defaultValue="description" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="description">상품 상세</TabsTrigger>
-              <TabsTrigger value="reviews">상품 후기 ({productDisplay.reviewCount})</TabsTrigger>
               <TabsTrigger value="qna">상품 문의</TabsTrigger>
-              <TabsTrigger value="community">커뮤니티</TabsTrigger>
             </TabsList>
             <TabsContent value="description" className="mt-8">
                 <Image src="https://placehold.co/1200x800.png" alt="상품 상세 이미지" width={1200} height={800} className="w-full rounded-lg" />
-            </TabsContent>
-            <TabsContent value="reviews" className="mt-8 space-y-4">
-              <ReviewForm
-                productId={id}
-                onSubmitted={() => setReviewRefresh((v) => v + 1)}
-              />
-              <ReviewList productId={id} refresh={reviewRefresh} />
             </TabsContent>
             <TabsContent value="qna" className="mt-8">
               <Button>
                 <MessageCircle className="w-4 h-4 mr-2" />문의하기
               </Button>
-            </TabsContent>
-            <TabsContent value="community" className="mt-8 space-y-8">
-              <PostCreate productId={id} />
-              <PostList productId={id} />
             </TabsContent>
           </Tabs>
         </div>

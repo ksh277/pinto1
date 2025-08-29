@@ -45,7 +45,7 @@ export default function CategoryPage() {
   }, [products, slug, activeSubCategory, isProductsLoading]);
 
   const sortedProducts = useMemo(() => {
-    const toMillis = (d: Date | import('firebase/firestore').Timestamp) =>
+    const toMillis = (d: Date | { toDate: () => Date }) =>
       d instanceof Date ? d.getTime() : d.toDate().getTime();
     return [...filteredProducts].sort((a: Product, b: Product) => {
       switch (sortOrder) {
