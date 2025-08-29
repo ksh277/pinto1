@@ -14,11 +14,9 @@ import {
   Minus,
   Upload,
   Download,
-  MessageCircle,
   Puzzle,
   ChevronRight,
   CreditCard,
-  Heart,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,11 +25,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/hooks/useLanguage';
 import Image from 'next/image';
-import PostCreate from '@/components/community/PostCreate';
-import PostList from '@/components/community/PostList';
-import ReviewForm from '@/components/reviews/ReviewForm';
-import ReviewList from '@/components/reviews/ReviewList';
-import { toggleLike, getLikeCount, getMyLike } from '@/lib/likes';
 
 export default function ProductDetail() {
   const params = useParams();
@@ -43,9 +36,6 @@ export default function ProductDetail() {
   const { addToCart } = useCartContext();
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [reviewRefresh, setReviewRefresh] = useState(0);
 
   // State management
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -64,8 +54,6 @@ export default function ProductDetail() {
   useEffect(() => {
     if (productData) {
       setProduct(productData);
-      setLikeCount(productData.stats?.likeCount ?? 0);
-
       if (productData.options?.sizes?.length) {
         setSelectedSize(productData.options.sizes[0].name);
       }
@@ -80,11 +68,6 @@ export default function ProductDetail() {
       }
     }
   }, [id, productData]);
-
-  useEffect(() => {
-    getLikeCount(id).then(setLikeCount);
-    getMyLike(id).then(setLiked);
-  }, [id]);
 
   const productDisplay = useMemo(() => {
     if (!product) return null;
@@ -182,22 +165,6 @@ export default function ProductDetail() {
     if (file && file.type === "application/pdf") {
       setUploadedFile(file);
       toast({ title: "PDF 파일 업로드 완료", description: `${file.name}이(가) 업로드되었습니다.` });
-    }
-  };
-
-  const handleLike = async () => {
-    const prevLiked = liked;
-    const prevCount = likeCount;
-    setLiked(!prevLiked);
-    setLikeCount(prevLiked ? prevCount - 1 : prevCount + 1);
-    try {
-      await toggleLike(id);
-    } catch (e) {
-      setLiked(prevLiked);
-      setLikeCount(prevCount);
-      const msg = e instanceof Error ? e.message : 'error';
-      if (msg === 'login-required') alert('로그인이 필요합니다.');
-      else alert('좋아요 처리 중 오류가 발생했습니다.');
     }
   };
 
@@ -316,16 +283,6 @@ export default function ProductDetail() {
                 <div className="flex mr-2">{generateStars(Math.round(productDisplay.rating))}</div>
                 <span className="text-sm text-gray-500 dark:text-gray-400">{productDisplay.rating.toFixed(1)} ({productDisplay.reviewCount} 리뷰)</span>
               </div>
-              <button
-                onClick={handleLike}
-                className={`flex items-center gap-1 text-sm transition ${
-                  liked ? 'text-rose-500' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-                }`}
-                aria-label="좋아요"
-              >
-                <Heart className={`h-4 w-4 ${liked ? 'fill-rose-500 text-rose-500' : ''}`} />
-                {likeCount > 0 && <span>{likeCount}</span>}
-              </button>
             </div>
             </div>
 
@@ -525,30 +482,17 @@ export default function ProductDetail() {
 
         <div className="mt-12">
           <Tabs defaultValue="description" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="description">상품 상세</TabsTrigger>
-              <TabsTrigger value="reviews">상품 후기 ({productDisplay.reviewCount})</TabsTrigger>
               <TabsTrigger value="qna">상품 문의</TabsTrigger>
-              <TabsTrigger value="community">커뮤니티</TabsTrigger>
             </TabsList>
             <TabsContent value="description" className="mt-8">
                 <Image src="https://placehold.co/1200x800.png" alt="상품 상세 이미지" width={1200} height={800} className="w-full rounded-lg" />
             </TabsContent>
-            <TabsContent value="reviews" className="mt-8 space-y-4">
-              <ReviewForm
-                productId={id}
-                onSubmitted={() => setReviewRefresh((v) => v + 1)}
-              />
-              <ReviewList productId={id} refresh={reviewRefresh} />
-            </TabsContent>
             <TabsContent value="qna" className="mt-8">
               <Button>
-                <MessageCircle className="w-4 h-4 mr-2" />문의하기
+                문의하기
               </Button>
-            </TabsContent>
-            <TabsContent value="community" className="mt-8 space-y-8">
-              <PostCreate productId={id} />
-              <PostList productId={id} />
             </TabsContent>
           </Tabs>
         </div>

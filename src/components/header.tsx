@@ -14,7 +14,6 @@ import { mainNavItems } from '@/lib/categories';
 import { HeaderAuthNav } from './header-auth-nav';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import { TopStripBanner } from './TopStripBanner';
 
 export function Header() {
   const [activeSubNav, setActiveSubNav] = useState<string | null>(null);
@@ -60,7 +59,6 @@ export function Header() {
 
   return (
     <header className="w-full flex-col border-b bg-background">
-      <TopStripBanner />
 
       {/* 상단 유틸 바 */}
 
