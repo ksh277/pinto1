@@ -7,7 +7,7 @@ export async function addBanner({ imageUrl, title }: { imageUrl: string; title: 
   return Promise.resolve({ imageUrl, title });
 }
 
-export async function removeBanner(id: string) {
+export async function removeBanner(_id: string) {
   return Promise.resolve();
 }
 

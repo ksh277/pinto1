@@ -372,17 +372,41 @@ export function ProductEditor() {
     doc.addPage([wMm,hMm], 'portrait')
     if (store.state.whitePath?.path?.length){
       doc.setFillColor(0,0,0); doc.setDrawColor(0,0,0); doc.setLineWidth(0.25)
-      const pts = store.state.whitePath.path
-      doc.lines(pts.map((p,i,arr)=>{const prev=i?arr[i-1]:arr[0]; return [(p.x-prev.x)*25.4/store.state.size.dpi,(p.y-prev.y)*25.4/store.state.size.dpi]}),
-        pts[0].x*25.4/store.state.size.dpi, pts[0].y*25.4/store.state.size.dpi, [1,1], 'F', true)
+      const pts = store.state.whitePath.path as { x: number; y: number }[]
+      doc.lines(
+        pts.map((p: { x: number; y: number }, i: number, arr: { x: number; y: number }[]) => {
+          const prev = i ? arr[i - 1] : arr[0]
+          return [
+            ((p.x - prev.x) * 25.4) / store.state.size.dpi,
+            ((p.y - prev.y) * 25.4) / store.state.size.dpi,
+          ]
+        }),
+        (pts[0].x * 25.4) / store.state.size.dpi,
+        (pts[0].y * 25.4) / store.state.size.dpi,
+        [1, 1],
+        'F',
+        true,
+      )
     }
 
     doc.addPage([wMm,hMm], 'portrait')
     if (store.state.cutlinePath?.path?.length){
       doc.setDrawColor(0,0,0); doc.setLineWidth(0.25)
-      const pts = store.state.cutlinePath.path
-      doc.lines(pts.map((p,i,arr)=>{const prev=i?arr[i-1]:arr[0]; return [(p.x-prev.x)*25.4/store.state.size.dpi,(p.y-prev.y)*25.4/store.state.size.dpi]}),
-        pts[0].x*25.4/store.state.size.dpi, pts[0].y*25.4/store.state.size.dpi, [1,1], 'S', true)
+      const pts = store.state.cutlinePath.path as { x: number; y: number }[]
+      doc.lines(
+        pts.map((p: { x: number; y: number }, i: number, arr: { x: number; y: number }[]) => {
+          const prev = i ? arr[i - 1] : arr[0]
+          return [
+            ((p.x - prev.x) * 25.4) / store.state.size.dpi,
+            ((p.y - prev.y) * 25.4) / store.state.size.dpi,
+          ]
+        }),
+        (pts[0].x * 25.4) / store.state.size.dpi,
+        (pts[0].y * 25.4) / store.state.size.dpi,
+        [1, 1],
+        'S',
+        true,
+      )
     }
 
     doc.save(`ACRYLIC_${wMm}x${hMm}_CWC.pdf`)

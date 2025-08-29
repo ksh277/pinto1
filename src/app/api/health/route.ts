@@ -6,7 +6,7 @@ export async function GET() {
   try {
     await productRepository.ping();
     return new Response('ok');
-  } catch (err) {
+  } catch {
     return new Response('unhealthy', { status: 500 });
   }
 }

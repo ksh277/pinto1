@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+"use client";
+
+import { useState, type ChangeEvent } from "react";
 
 interface BannerItem {
   id: string;
@@ -11,7 +13,7 @@ export function BannerAdmin() {
   const [image, setImage] = useState<File | null>(null);
   const [title, setTitle] = useState('');
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
     }
