@@ -1,198 +1,441 @@
-'use client'
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect } from 'react'
-import Link from 'next/link'
-import { useEditorStore } from '@/store/editorStore'
-import { ProductEditor } from './ProductEditor'
+// ===== components/editor/EditorLayout.tsx =====
+'use client';
 
-export function EditorLayout({ initialProduct: _initialProduct }: { initialProduct?: string }) {
-  const { undo, redo, removeSelected, setPanning } = useEditorStore() as any
+import React, { useRef, useState, useMemo } from 'react';
+import { useEditorStore } from '@/store/editorStore';
+import { HoleSide } from '@/types/editor';
 
-  // Esc로 이동툴 해제
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setPanning(false) }
-    window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
-  }, [setPanning])
+// 유틸
+const clamp = (n: number, a: number, b: number) => Math.max(a, Math.min(b, n));
 
+// 간단 배경제거(샘플 RGB + 임계값 기반) - 업로드 즉시 투명 배경 버전 생성
+async function removeBgFromFile(
+  file: File,
+  sample: [number, number, number] | undefined,
+  threshold: number
+) {
+  const url = URL.createObjectURL(file);
+  const img = await new Promise<HTMLImageElement>((res, rej) => {
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = () => res(im);
+    im.onerror = rej;
+    im.src = url;
+  });
+
+  const c = document.createElement('canvas');
+  c.width = img.width;
+  c.height = img.height;
+  const ctx = c.getContext('2d', { willReadFrequently: true })!;
+  ctx.drawImage(img, 0, 0);
+  const id = ctx.getImageData(0, 0, c.width, c.height);
+  const d = id.data;
+
+  // 샘플이 없으면 모서리 평균
+  let [sr, sg, sb]: [number, number, number] = sample ?? [255, 255, 255];
+  if (!sample) {
+    const pick = (x: number, y: number) => {
+      const i = (y * c.width + x) * 4;
+      return [d[i], d[i + 1], d[i + 2]] as [number, number, number];
+    };
+    const P = [
+      pick(1, 1),
+      pick(c.width - 2, 1),
+      pick(1, c.height - 2),
+      pick(c.width - 2, c.height - 2),
+    ];
+    sr = Math.round(P.reduce((s, p) => s + p[0], 0) / P.length);
+    sg = Math.round(P.reduce((s, p) => s + p[1], 0) / P.length);
+    sb = Math.round(P.reduce((s, p) => s + p[2], 0) / P.length);
+  }
+
+  const thr = clamp(threshold, 0, 128);
+  for (let i = 0; i < d.length; i += 4) {
+    const dr = d[i] - sr,
+      dg = d[i + 1] - sg,
+      db = d[i + 2] - sb;
+    const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+    if (dist < thr) d[i + 3] = 0; // 투명
+  }
+  ctx.putImageData(id, 0, 0);
+
+  const blob: Blob = await new Promise((r) => c.toBlob((b) => r(b!), 'image/png', 1)!);
+  const processedUrl = URL.createObjectURL(blob);
+  const originalUrl = url; // 원본은 호출부에서 관리
+
+  return { processedUrl, originalUrl };
+}
+
+// named + default 둘 다 제공
+export function EditorLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-[calc(100vh)] flex-col bg-[#efefef]">
-      {/* 상단 바 */}
-      <header className="flex h-14 items-center justify-between bg-white px-4 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="font-semibold">ALL THAT PRINTING <span className="text-xs font-normal">EDITOR</span></div>
-          <div className="text-sm text-gray-500">|</div>
-          <select className="rounded-md border px-2 py-1 text-sm">
-            <option>키링</option>
-            <option>스탠드</option>
-            <option>스마트톡</option>
-          </select>
-        </div>
-        <div className="flex items-center gap-6 text-sm">
-          <ToolbarButton onClick={undo}>이전</ToolbarButton>
-          <ToolbarButton onClick={redo}>이후</ToolbarButton>
-          <ToolbarButton onClick={() => setPanning(true)}>이동</ToolbarButton>
-          <ToolbarButton onClick={removeSelected}>삭제</ToolbarButton>
-        </div>
-        <div className="flex items-center gap-2">
-          <ToolbarGhostButton onClick={()=>document.getElementById('file-input')?.click()}>불러오기</ToolbarGhostButton>
-          <ToolbarGhostButton onClick={()=>document.getElementById('btn-save')?.dispatchEvent(new Event('click',{bubbles:true}))}>저장</ToolbarGhostButton>
-          <ToolbarPrimaryButton onClick={()=>document.getElementById('btn-pdf')?.dispatchEvent(new Event('click',{bubbles:true}))}>PDF 다운로드</ToolbarPrimaryButton>
-          <Link href="/" className="rounded-md border px-3 py-2 text-sm">✕ 창닫기</Link>
-        </div>
-      </header>
-
-      {/* 본문 */}
-      <div className="grid flex-1 grid-cols-[280px_1fr] gap-0">
-        <LeftRail />
-        <div className="relative">
-          <ProductEditor />
-          <BottomBar />
-        </div>
-      </div>
+    <div className="flex h-full w-full">
+      <LeftPanel />
+      <div className="flex-1 overflow-auto bg-neutral-50 p-4">{children}</div>
     </div>
-  )
+  );
 }
+export default EditorLayout;
 
-function ToolbarButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return <button {...props} className="text-sm text-gray-600 hover:text-black" />
-}
-function ToolbarGhostButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return <button {...props} className="rounded-md border px-3 py-2 text-sm" />
-}
-function ToolbarPrimaryButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return <button {...props} className="rounded-md bg-black px-3 py-2 text-sm text-white" />
-}
+/* ------------------------- Left Panel ------------------------- */
+function LeftPanel() {
+  const s = useEditorStore();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [fileName, setFileName] = useState<string>('');
 
-/** 좌측 레일 */
-function LeftRail() {
-  const { state, setMode, setTemplate, setSizeMM, lockSize, addImageFromSrc, addText, setBgSample, setBgThreshold, setCutOffsetMM, setWhiteShrinkMM } = useEditorStore() as any
-  const [w, setW] = React.useState(state.size.widthMM)
-  const [h, setH] = React.useState(state.size.heightMM)
-  const fileRef = React.useRef<HTMLInputElement>(null)
-  const firstImg = state.nodes.find((n: any) => n.type === 'image') as any
+  // 썸네일 (현재 한 장 기준)
+  const thumbUrl = useMemo(() => {
+    const i = s.images.selected;
+    if (i < 0) return null;
+    return s.images.processed[i] || s.images.originals[i];
+  }, [s.images]);
+
+  // 파일 선택/드롭
+  const handlePick = async (file: File) => {
+    setFileName(file.name);
+
+    // 배경제거 + 원본 등록
+    const { processedUrl, originalUrl } = await removeBgFromFile(
+      file,
+      s.bgSampleRGB ?? undefined,
+      s.bgThreshold
+    );
+
+    // 스토어: 파일에서 이미지 추가
+    await s.addImageFromFile(file);
+
+    // 추가된 이미지에 processedUrl 연결
+    const nextIndex = useEditorStore.getState().images.originals.length - 1;
+    if (nextIndex >= 0) {
+      useEditorStore.getState().setProcessedUrlForSelected(processedUrl);
+    }
+
+    // 보드 맞추기
+    s.requestFit();
+  };
+
+  const onInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) void handlePick(f);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const f = e.dataTransfer.files?.[0];
+    if (f) void handlePick(f);
+  };
+
+  const restoreOriginal = () => {
+    // processed 대신 original 사용하도록 null
+    s.setProcessedUrlForSelected(null);
+  };
+
+  const applyBgRemove = async () => {
+    // 현재 original에서 다시 배경제거
+    const i = s.images.selected;
+    const src = i >= 0 ? s.images.originals[i] : null;
+    if (!src) return;
+
+    const blob = await fetch(src).then((r) => r.blob());
+    const file = new File([blob], fileName || 'image.png', {
+      type: blob.type || 'image/png',
+    });
+    const { processedUrl } = await removeBgFromFile(file, s.bgSampleRGB ?? undefined, s.bgThreshold);
+    s.setProcessedUrlForSelected(processedUrl);
+  };
+
+  const fitContain = () => {
+    s.requestFit();
+  };
+
+  // 사이즈 프리셋
+  const presets = [
+    { w: 20, h: 20 },
+    { w: 30, h: 30 },
+    { w: 50, h: 50 },
+    { w: 70, h: 70 },
+    { w: 100, h: 100 },
+  ];
+
+  const setSize = (w: number, h: number) => s.setSizeMM(w, h);
+
+  const NumberField = ({
+    label,
+    value,
+    onChange,
+    min = 0,
+    max = 999,
+    step = 1,
+    unit = 'mm',
+  }: {
+    label: string;
+    value: number;
+    onChange: (v: number) => void;
+    min?: number;
+    max?: number;
+    step?: number;
+    unit?: string;
+  }) => (
+    <label className="flex items-center gap-2">
+      <span className="w-16 text-sm text-neutral-600">{label}</span>
+      <input
+        type="number"
+        className="input input-bordered w-24"
+        value={value}
+        step={step}
+        min={min}
+        max={max}
+        onChange={(e) => onChange(clamp(Number(e.target.value), min, max))}
+      />
+      <span className="text-xs text-neutral-500">{unit}</span>
+    </label>
+  );
+
+  const SliderRow = ({
+    label,
+    value,
+    onChange,
+    min,
+    max,
+    step,
+    suffix,
+  }: {
+    label: string;
+    value: number;
+    onChange: (v: number) => void;
+    min: number;
+    max: number;
+    step: number;
+    suffix?: string;
+  }) => (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between">
+        <span className="text-sm">{label}</span>
+        <span className="text-xs text-neutral-500">
+          {value}
+          {suffix}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="range range-xs w-full"
+      />
+    </div>
+  );
 
   return (
-    <aside className="flex h-full flex-col bg-[#2b2b2b] text-white">
-      {/* 탭 */}
-      <div className="grid h-12 grid-cols-2">
-        <button className={`text-sm ${state.mode==='auto'?'bg-[#1f1f1f]':''}`} onClick={()=>setMode('auto')}>자율형</button>
-        <button className={`text-sm ${state.mode==='template'?'bg-[#1f1f1f]':''}`} onClick={()=>setMode('template')}>템플릿핑</button>
-      </div>
-
-      {/* 섹션 */}
-      <div className="flex-1 space-y-6 overflow-y-auto p-4 text-sm">
-        <div>
-          <div className="mb-2 text-gray-300">사이즈 (mm)</div>
-          <div className="flex gap-2">
-            <input type="number" className="w-20 rounded bg-[#1f1f1f] px-2 py-1" value={w} onChange={e=>setW(parseFloat(e.target.value||'0'))} />
-            <input type="number" className="w-20 rounded bg-[#1f1f1f] px-2 py-1" value={h} onChange={e=>setH(parseFloat(e.target.value||'0'))} />
-            <button className="rounded bg-white px-3 py-1 text-black" onClick={()=>{ setSizeMM(w,h); lockSize(true) }}>적용</button>
-          </div>
-          {!state.ui.sizeLocked && <div className="mt-3 text-xs text-gray-400">사이즈 선택 후 이용 가능합니다.</div>}
+    <aside className="w-[320px] shrink-0 border-r bg-white p-4">
+      {/* 사이즈 */}
+      <section className="mb-6 space-y-2">
+        <h3 className="font-semibold">자율형</h3>
+        <div className="flex items-center gap-3">
+          <NumberField
+            label="가로"
+            value={s.size.widthMM}
+            onChange={(v) => s.setSizeMM(v, s.size.heightMM)}
+          />
+          <NumberField
+            label="세로"
+            value={s.size.heightMM}
+            onChange={(v) => s.setSizeMM(s.size.widthMM, v)}
+          />
         </div>
 
-        <div>
-          <div className="mb-2 text-gray-300">이미지</div>
-          <input id="file-input" ref={fileRef} type="file" accept="image/*" hidden
-                 onChange={e=>{ const f=e.target.files?.[0]; if(f){ const r=new FileReader(); r.onload=()=>addImageFromSrc(r.result as string); r.readAsDataURL(f) }}}/>
-          <button className="w-full rounded bg-white px-3 py-2 text-black" onClick={()=>fileRef.current?.click()} disabled={!state.ui.sizeLocked}>이미지 불러오기</button>
-          {firstImg ? (
-            <div className="mt-2">
-              <img src={firstImg.src} alt="preview" className="w-full cursor-crosshair" onClick={e=>{
-                const img=e.currentTarget
-                const rect=img.getBoundingClientRect()
-                const x=e.clientX-rect.left, y=e.clientY-rect.top
-                const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight
-                const ctx=c.getContext('2d')!; ctx.drawImage(img,0,0)
-                const sx=Math.floor(x*img.naturalWidth/rect.width)
-                const sy=Math.floor(y*img.naturalHeight/rect.height)
-                const d=ctx.getImageData(sx,sy,1,1).data
-                setBgSample([d[0],d[1],d[2]])
-              }} />
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs text-gray-400">배경제거 임계값</span>
-                <input type="range" min={0} max={128} value={state.bgThreshold} onChange={e=>setBgThreshold(parseInt(e.target.value))} />
-                <span className="w-8 text-center">{state.bgThreshold}</span>
-              </div>
-              <div className="mt-1 text-xs text-gray-400">이미지 위를 클릭하면 배경색 샘플링</div>
-            </div>
-          ) : null}
-        </div>
-
-        <div>
-          <div className="mb-2 text-gray-300">텍스트</div>
-          <button className="w-full rounded border border-white/30 px-3 py-2" onClick={()=>addText('텍스트')} disabled={!state.ui.sizeLocked}>텍스트 추가</button>
-        </div>
-
-        <div>
-          <div className="mb-2 text-gray-300">컷/화이트</div>
-          <div className="space-y-2">
-            <div>
-              <input type="range" min={2} max={15} value={state.offsets.cutOffsetMM} onChange={e=>setCutOffsetMM(parseFloat(e.target.value))} />
-              <div className="mt-1 text-xs">컷 오프셋 {state.offsets.cutOffsetMM.toFixed(1)}mm</div>
-            </div>
-            <div>
-              <input type="range" min={0.06} max={0.10} step={0.01} value={state.whiteShrinkMM} onChange={e=>setWhiteShrinkMM(parseFloat(e.target.value))} />
-              <div className="mt-1 text-xs">화이트 수축 {state.whiteShrinkMM.toFixed(2)}mm</div>
-            </div>
+        <div className="flex flex-wrap gap-2 text-xs">
+          {presets.map((p) => (
+            <button
+              key={`${p.w}x${p.h}`}
+              onClick={() => setSize(p.w, p.h)}
+              className="btn btn-xs"
+            >
+              {p.w}×{p.h}
+            </button>
+          ))}
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-xs text-neutral-500">DPI</span>
+            <select
+              className="select select-bordered select-xs"
+              value={s.dpi}
+              onChange={(e) => s.setDpi(Number(e.target.value) as 300 | 600)}
+            >
+              <option value={300}>300</option>
+              <option value={600}>600</option>
+            </select>
           </div>
         </div>
+      </section>
 
-        {state.mode==='template' && (
-          <div>
-            <div className="mb-2 text-gray-300">판 모양</div>
-            <div className="grid grid-cols-4 gap-2">
-              {(['rect','circle','pentagon','hexagon'] as const).map(t=> (
-                <button key={t} className={`rounded px-2 py-1 ${state.templatePlate===t?'bg-white text-black':'bg-[#1f1f1f]'}`} onClick={()=>setTemplate(t)}>{t}</button>
-              ))}
+      {/* 이미지 */}
+      <section className="mb-6 space-y-2">
+        <div className="font-medium">이미지</div>
+
+        <div
+          className={`rounded border p-3 text-center ${
+            dragOver ? 'bg-teal-50 border-teal-400' : 'bg-gray-50'
+          }`}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={onDrop}
+        >
+          <div className="mb-2 text-xs text-neutral-500">
+            파일을 여기로 드래그하거나 아래 버튼으로 선택하세요
+          </div>
+          <div className="flex justify-center">
+            <button className="btn btn-sm" onClick={() => inputRef.current?.click()}>
+              파일 선택
+            </button>
+            <input ref={inputRef} type="file" accept="image/*" hidden onChange={onInput} />
+          </div>
+          <div className="mt-2 text-xs text-neutral-600 truncate">
+            {fileName || '선택된 파일 없음'}
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <button className="btn btn-xs" onClick={applyBgRemove}>
+            배경이미지 제거
+          </button>
+          <button className="btn btn-xs" onClick={restoreOriginal}>
+            배경 제거 해제(원본)
+          </button>
+          <button className="btn btn-xs" onClick={fitContain}>
+            보드에 맞추기(Contain)
+          </button>
+        </div>
+
+        <div className="rounded border p-2 text-[11px] text-neutral-500">
+          썸네일 클릭으로 대상 선택 · 캔버스 클릭 시 배경색 샘플링
+          <br />
+          팁 · 드래그/핸들로 이동·크기·회전
+        </div>
+
+        {thumbUrl && (
+          <div className="mt-2 flex items-center gap-2 rounded-lg border p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={thumbUrl}
+              alt="thumb"
+              className="h-12 w-12 rounded bg-white object-contain"
+            />
+            <div className="text-xs text-neutral-600">
+              샘플 RGB:{' '}
+              {s.bgSampleRGB ? s.bgSampleRGB.join(', ') : '샘플 미지정'}
             </div>
           </div>
         )}
+
+        <SliderRow
+          label="배경제거 임계값"
+          value={s.bgThreshold}
+          onChange={(v) => s.setBgThreshold(v)}
+          min={0}
+          max={128}
+          step={1}
+        />
+      </section>
+
+      {/* 구멍/귀 */}
+      <section className="mb-6 space-y-2">
+        <div className="font-medium">키링 구멍/귀</div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm">모드</span>
+          <select
+            className="select select-bordered select-xs w-28"
+            value={s.hole.mode}
+            onChange={(e) => s.setHoleMode(e.target.value as 'auto' | 'manual')}
+          >
+            <option value="auto">자동</option>
+            <option value="manual">수동(캔버스 클릭)</option>
+          </select>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-sm">구멍 개수</span>
+          <select
+            className="select select-bordered select-xs w-24"
+            value={s.hole.count}
+            onChange={(e) => s.setHoleCount(Number(e.target.value) as 1 | 2)}
+          >
+            <option value={1}>1개</option>
+            <option value={2}>2개</option>
+          </select>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-sm">방향</span>
+          <select
+            className="select select-bordered select-xs w-24"
+            value={s.hole.side}
+            onChange={(e) => s.setHoleSide(e.target.value as HoleSide)}
+          >
+            <option value="top">상단</option>
+            <option value="left">좌측</option>
+            <option value="right">우측</option>
+          </select>
+        </div>
+
+        <SliderRow
+          label="구멍 지름"
+          value={s.hole.diaMM}
+          onChange={(v) => s.setHoleDiaMM(v)}
+          min={2}
+          max={6}
+          step={0.5}
+          suffix="mm"
+        />
+        <SliderRow
+          label="귀 추가 반경"
+          value={s.hole.earExtraMM}
+          onChange={(v) => s.setEarExtraMM(v)}
+          min={1}
+          max={5}
+          step={0.5}
+          suffix="mm"
+        />
+
+        {s.hole.mode === 'manual' && (
+          <div className="rounded-md bg-amber-50 p-2 text-[11px] text-amber-700">
+            수동 모드입니다. 캔버스에서 원하는 위치를 클릭하면 구멍이 추가됩니다. 드래그로 이동 가능.
+          </div>
+        )}
+      </section>
+
+      {/* 컷/화이트 */}
+      <section className="mb-6 space-y-2">
+        <div className="font-medium">컷/화이트</div>
+        <SliderRow
+          label="컷 오프셋"
+          value={s.cutOffsetMM}
+          onChange={(v) => s.setCutOffsetMM(v)}
+          min={2}
+          max={12}
+          step={0.5}
+          suffix="mm"
+        />
+        <SliderRow
+          label="화이트 수축"
+          value={s.whiteShrinkMM}
+          onChange={(v) => s.setWhiteShrinkMM(v)}
+          min={0.06}
+          max={0.1}
+          step={0.01}
+          suffix="mm"
+        />
+      </section>
+
+      <div className="pt-2 text-xs text-neutral-400">
+        ⓘ 배경색은 캔버스에서 클릭해 샘플링할 수 있습니다. (상단 안내문 참조)
       </div>
     </aside>
-  )
-}
-
-/** 하단 바 */
-function BottomBar() {
-  const { state, setRingCount, setRingSize, toggleRingBack, toggleRingFront, setWhiteWrap, zoomOut, zoomIn } = useEditorStore() as any
-  return (
-    <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-10 border-t bg-white/95 px-4 py-2">
-      <div className="flex items-center gap-3 text-sm">
-        <label className="flex items-center gap-2">고리개수
-          <button className="rounded border px-2" onClick={()=>setRingCount(state.ui.ringCount-1)}>-</button>
-          <span className="w-6 text-center">{state.ui.ringCount}</span>
-          <button className="rounded border px-2" onClick={()=>setRingCount(state.ui.ringCount+1)}>+</button>
-        </label>
-
-        <div className="flex items-center gap-2">
-          고리방향
-          <label className="flex items-center gap-1"><input type="checkbox" checked={state.ui.ringBack} onChange={toggleRingBack}/> 바깥쪽</label>
-          <label className="flex items-center gap-1"><input type="checkbox" checked={state.ui.ringFront} onChange={toggleRingFront}/> 안쪽</label>
-        </div>
-
-        <div className="flex items-center gap-2">
-          고리크기
-          {[2,2.5,3,4].map(mm=> (
-            <button key={mm} className={`rounded border px-2 ${state.ui.ringSizeMM===mm?'bg-black text-white':''}`} onClick={()=>setRingSize(mm)}>{mm}mm</button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2">
-          화이트둘러싸기
-          <button className="rounded border px-2" onClick={()=>setWhiteWrap(state.ui.whiteWrap-1)}>-</button>
-          <span className="w-6 text-center">{state.ui.whiteWrap}</span>
-          <button className="rounded border px-2" onClick={()=>setWhiteWrap(state.ui.whiteWrap+1)}>+</button>
-        </div>
-
-        <div className="ml-auto flex items-center gap-2">
-          <button className="rounded border px-2" onClick={zoomOut}>-</button>
-          <span className="w-14 text-center">{Math.round(state.ui.zoom*100)}%</span>
-          <button className="rounded border px-2" onClick={zoomIn}>+</button>
-          <button id="btn-pdf" className="hidden" />
-          <button id="btn-save" className="hidden" />
-        </div>
-      </div>
-    </div>
-  )
+  );
 }

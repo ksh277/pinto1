@@ -27,7 +27,7 @@ export function Header() {
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const router = useRouter();
 
   const handleCategoryHover = (cat: string) => {
@@ -64,17 +64,20 @@ export function Header() {
 
       {/* 상단 유틸 바 */}
 
-  <div className="border-b hidden md:block">
-  </div>
-        <div className="w-full mx-auto flex h-10 items-center px-4 text-xs">
-          <div className="flex flex-1 items-center justify-end gap-4">
-            <Link href="/register" className="hover:text-primary text-sm">회원가입</Link>
-            <Link href="/login" className="hover:text-primary text-sm">로그인</Link>
-            <Link href="/mypage/orders" className="hover:text-primary text-sm" onClick={handleOrderClick}>주문조회</Link>
-          </div>
+      <div className="border-b hidden md:block"></div>
+      <div className="w-full mx-auto flex h-10 items-center px-4 text-xs">
+        <div className="flex flex-1 items-center justify-end gap-4">
+          <Link href="/register" className="hover:text-primary text-sm">회원가입</Link>
+          <Link href="/login" className="hover:text-primary text-sm">로그인</Link>
+          <Link href="/mypage/orders" className="hover:text-primary text-sm" onClick={handleOrderClick}>주문조회</Link>
+          {/* 관리자 모드 버튼: 로그인+관리자만 노출 */}
+          {isAuthenticated && user?.isAdmin && (
+            <Link href="/admin" className="ml-2 px-3 py-1 rounded bg-amber-100 text-amber-800 font-semibold text-xs border border-amber-300 hover:bg-amber-200 transition">
+              관리자 모드
+            </Link>
+          )}
         </div>
-
-
+      </div>
 
       {/* 메인 헤더 */}
       <div className="w-full">

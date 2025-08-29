@@ -267,7 +267,7 @@ function LoginContent() {
                   variant="outline"
                   className="w-full h-10 border-border hover:bg-background/50"
                 >
-                  회원가입
+                  일반 회원가입
                 </Button>
               </Link>
             </div>
