@@ -123,7 +123,7 @@ export default function CategoryPage() {
             ))
         ) : (
           sortedProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} stats={product.stats} />
           ))
         )}
       </div>
