@@ -4,17 +4,21 @@ This project uses MySQL via Prisma, NextAuth for authentication, and an S3-compa
 
 ## Setup
 
-1. Copy `.env.example` to `.env` and fill in the values.
-2. Install dependencies:
+1. Start the MySQL container:
+   ```bash
+   docker compose up -d
+   ```
+2. Copy `.env.example` to `.env` and fill in the values.
+3. Install dependencies:
    ```bash
    npm install
    ```
-3. Prepare the database and seed sample data:
+4. Prepare the database and seed sample data:
    ```bash
    npx prisma db push
    npm run db:seed
    ```
-4. Build and start the app:
+5. Build and start the app:
    ```bash
    npm run build
    npm start

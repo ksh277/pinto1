@@ -1,0 +1,20 @@
+services:
+  mysql:
+    container_name: pinto-mysql
+    image: mysql:8
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: pinto
+    ports:
+      - "3307:3306"
+    volumes:
+      - pinto_mysql:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-psecret"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+volumes:
+  pinto_mysql:
