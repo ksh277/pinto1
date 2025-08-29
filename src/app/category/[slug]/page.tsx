@@ -12,24 +12,25 @@ import { cn } from '@/lib/utils';
 import type { Product, ProductSubcategory } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
+
 export default function CategoryPage() {
-  const params = useParams();
+  const params = useParams() ?? {};
   const searchParams = useSearchParams();
-  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  const slug = Array.isArray((params as any).slug) ? (params as any).slug[0] : (params as any).slug ?? '';
 
   const { products, isProductsLoading } = useProductContext();
   
   const [activeSubCategory, setActiveSubCategory] = useState<ProductSubcategory | 'all'>('all');
-  const [sortOrder, setSortOrder] = useState('newest');
+  const [sortOrder, setSortOrder] = useState<'newest' | 'popular' | 'review' | 'price_asc' | 'price_desc'>('newest');
 
   const categoryInfo = slug ? categoriesMap[slug] : undefined;
 
   useEffect(() => {
-    const subCategory = searchParams.get('sub') as ProductSubcategory | null;
-  if (subCategory && categoryInfo?.subCategories.some(sc => sc.id === subCategory)) {
-    setActiveSubCategory(subCategory);
+    const subCategory = searchParams?.get('sub') as ProductSubcategory | null;
+    if (subCategory && categoryInfo?.subCategories.some(sc => sc.id === subCategory)) {
+      setActiveSubCategory(subCategory);
     } else {
-        setActiveSubCategory('all');
+      setActiveSubCategory('all');
     }
   }, [searchParams, categoryInfo]);
 
@@ -97,7 +98,7 @@ export default function CategoryPage() {
         ) : (
             <p className="text-sm text-muted-foreground">총 {sortedProducts.length}개의 상품이 있습니다.</p>
         )}
-        <Select value={sortOrder} onValueChange={setSortOrder}>
+  <Select value={sortOrder} onValueChange={v => setSortOrder(v as typeof sortOrder)}>
           <SelectTrigger className="w-[120px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>

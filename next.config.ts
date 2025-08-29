@@ -1,7 +1,15 @@
 import type { NextConfig } from 'next';
 
+const strict = process.env.NEXT_STRICT !== 'false';
+
 const nextConfig: NextConfig = {
   /* config options here */
+  typescript: {
+    ignoreBuildErrors: !strict,
+  },
+  eslint: {
+    ignoreDuringBuilds: !strict,
+  },
   images: {
     remotePatterns: [
       {

@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import type { ProductRepository, OrderRepository } from '../types';
-
-const prisma = new PrismaClient();
 
 async function ping(): Promise<void> {
   await prisma.$queryRaw`SELECT 1`;

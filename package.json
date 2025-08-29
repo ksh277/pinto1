@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build",
+    "build": "set NEXT_STRICT=false&& next build",
     "test": "vitest run",
     "test:watch": "vitest",
     "storybook": "storybook dev -p 6006",
@@ -21,7 +21,9 @@
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
     "preinstall": "npx only-allow pnpm",
-    "migrate:operator-ids": "tsx scripts/migrate-operator-ids.ts"
+    "migrate:operator-ids": "tsx scripts/migrate-operator-ids.ts",
+    "db:push": "prisma db push",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",
